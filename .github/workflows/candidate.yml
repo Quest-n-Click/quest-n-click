@@ -98,7 +98,7 @@ jobs:
         timeout-minutes: 8
       - run: npm run test:heavy -- --reporter=default --reporter=json --outputFile.json=heavy-${{ matrix.attempt }}.json
       - if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: heavy-${{ matrix.attempt }}
           path: heavy-${{ matrix.attempt }}.json
@@ -126,7 +126,7 @@ jobs:
       - if: always()
         run: npx tsx tools/load-report.ts bridge-load-sqlite.json --store=sqlite --commit=${{ needs.target.outputs.sha }}
       - if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: bridge-load-sqlite
           path: |
@@ -165,7 +165,7 @@ jobs:
       - if: always()
         run: npx tsx tools/load-report.ts bridge-load-postgres.json --store=postgres --commit=${{ needs.target.outputs.sha }}
       - if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: bridge-load-postgres
           path: |
@@ -198,7 +198,7 @@ jobs:
         run: |
           mkdir -p candidate-release
           npm run -s e2e:remix-speedrun -- --out=candidate-release/wsrun | tee candidate-release/e2e-remix-speedrun.txt
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: candidate-release
           path: candidate-release
@@ -253,7 +253,7 @@ jobs:
       - run: npm run test:mutation:core -- --set=${{ matrix.set }} | tee mutation-${{ matrix.set }}.txt
         shell: bash
       - if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: mutation-${{ matrix.set }}
           path: |
@@ -284,13 +284,13 @@ jobs:
       # Their SBOMs (4.1.19, plan §6.3), from what the archives hold: the Bridge's and the connectors' own locks, the
       # engine's dependencies as the root lock resolves them, the creator's one dependency by its archive's SHA-256.
       - run: node scripts/sbom.mjs --pack=candidate-pack --out=candidate-sbom
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: candidate-pack
           path: candidate-pack
           if-no-files-found: error
           overwrite: true
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: candidate-sbom
           path: candidate-sbom
@@ -316,7 +316,7 @@ jobs:
           path: candidate-pack
       - run: for i in 1 2 3; do (node scripts/bridge-image.mjs build --tarballs=candidate-pack --out=candidate-image) && break; [ "$i" = 3 ] && exit 1; echo "retry $i"; sleep 15; done
         timeout-minutes: 12
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: candidate-image
           path: candidate-image
@@ -414,7 +414,7 @@ jobs:
       # volume, the 4.1.17 store), which the `qualify` workflow runs whole.
       - run: npm run ops:qualify -- --tarballs=candidate-pack --image-from=candidate-image --short --out=deployment-smoke
       - if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: deployment-smoke
           path: deployment-smoke
@@ -537,13 +537,13 @@ jobs:
         uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2
         with:
           subject-path: candidate-manifest.json
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: candidate-baseline
           path: artifacts/candidate-release/baseline
           if-no-files-found: error
           overwrite: true
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: candidate-manifest
           path: candidate-manifest.json

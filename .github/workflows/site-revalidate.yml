@@ -1,0 +1,33 @@
+name: site-revalidate
+# Tell the showcase site (github.com/wanoo/quest-n-click-site, quest-n-click.cleverapps.io) that something was
+# published, so it re-reads GitHub and loads the newest documentation archive without a redeploy. It runs after any
+# release is published (a product release or a `docs-v<v>-r<n>` revision) and after docs-publish completed; a call
+# that finds nothing new is harmless, and the site checks on its own once an hour anyway. The secret
+# `SITE_REVALIDATE_SECRET` is the site's `REVALIDATE_SECRET`.
+on:
+  release:
+    types: [published]
+  workflow_run:
+    workflows: [docs-publish]
+    types: [completed]
+  workflow_dispatch:
+permissions: {}
+jobs:
+  call:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Ask the site to reload
+        env:
+          SECRET: ${{ secrets.SITE_REVALIDATE_SECRET }}
+        run: |
+          if [ -z "$SECRET" ]; then echo "::notice::SITE_REVALIDATE_SECRET is not set; nothing to do"; exit 0; fi
+          # The release's assets may still be uploading when the event fires: a few tries, a minute apart.
+          for i in 1 2 3 4 5; do
+            code=$(curl -sS -o body.json -w '%{http_code}' -X POST https://quest-n-click.cleverapps.io/api/revalidate \
+              -H "Authorization: Bearer $SECRET" -H 'Content-Type: application/json' -d '{}') || code=000
+            echo "try $i: $code $(cat body.json 2>/dev/null)"
+            [ "$code" = 200 ] && exit 0
+            sleep 60
+          done
+          echo "::warning::the site did not answer 200; it will catch up on its own within the hour"

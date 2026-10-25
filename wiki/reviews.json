@@ -406,7 +406,8 @@
       "claimTextHash": "ef0b9a44279ae51a688135931f4f373fe9cc58a40b4ab10117026f091400c575",
       "testFileHash": "bd65c83ca390bc8bd82f319d15cdbb533898325b8af0c164354ca5a5486213a6",
       "reviewers": [
-        { "name": "Claude", "kind": "ai", "relation": "author", "date": "2026-10-25" }
+        { "name": "Claude", "kind": "ai", "relation": "author", "date": "2026-10-25" },
+        { "name": "LostInBrittany", "kind": "human", "relation": "independent", "date": "2026-10-25" }
       ]
     },
     "invitation-once-verified-email": {

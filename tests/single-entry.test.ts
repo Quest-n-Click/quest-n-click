@@ -59,6 +59,7 @@ const WRITERS: Record<string, string> = {
   'tools/talk-kit.py': 'adopted: talk kits under art/',
   'tools/talk-normalize.py': 'adopted: talk kits under art/',
   'tools/unit-shards.ts': 'elsewhere: tools/unit-durations.json (--record)',
+  'tools/heavy-shards.ts': 'elsewhere: tools/heavy-durations.json (--record)',
   'tools/placeholder-art.py': 'adopted: placeholder art for a new game',
   'tools/audio/mdpipe/__main__.py': 'adopted: npm run audio writes audio/',
   'tools/audio/mdpipe/analyze.py': 'adopted: npm run audio (analysis next to the stems)',

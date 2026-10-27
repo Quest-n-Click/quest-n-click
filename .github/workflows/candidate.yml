@@ -171,17 +171,22 @@ jobs:
         run: |
           v=$(node -p "require('./package.json').version")
           if [ -d "docs/dev/field/$v" ]; then npm run -s field:check -- --dir="docs/dev/field/$v"; else echo "::notice::no Field Kit report committed for $v"; fi
-  # The heavy solver suite three times, each on a new runner (plan §5): the counters and the oracle are deterministic,
-  # the durations are what three runs measure. One red attempt is a red candidate.
+  # The heavy solver suite three times (plan §5): the counters and the oracle are deterministic, the durations are what
+  # three runs measure. One red attempt is a red candidate. Each attempt in three shards, each on a new runner (4.5.7,
+  # #392): a whole attempt took up to 44 minutes, the candidate's critical path. The shards are `test:heavy`'s own files
+  # cut by their recorded durations (tools/heavy-shards.ts, tools/heavy-durations.json), each file in exactly one shard
+  # (tests/heavy-shards.test.ts), one file after the other; baseline.mjs and the summary rebuild each attempt from its
+  # three reports (a shard missing: the attempt is not measured).
   heavy:
     needs: target
     runs-on: ubuntu-24.04
-    # One file after the other since 4.1.17 (about 13 minutes on a laptop; the runner is several times slower).
-    timeout-minutes: 150
+    # About 15 minutes a shard on the slowest runners seen (a whole attempt took 20 to 44 minutes on one runner).
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
         attempt: [1, 2, 3]
+        shard: [1, 2, 3]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -192,12 +197,19 @@ jobs:
           cache: npm
       - run: for i in 1 2 3; do (timeout 3m npm ci) && break; [ "$i" = 3 ] && exit 1; echo "retry $i"; sleep 15; done
         timeout-minutes: 10
-      - run: npm run test:heavy -- --reporter=default --reporter=json --outputFile.json=heavy-${{ matrix.attempt }}.json
+      # The files on a line of their own: a failed or empty list stops the step here (`bash -e`), never a `vitest run`
+      # with no filter, which would run every test of the repository.
+      - name: The heavy suite, attempt ${{ matrix.attempt }}, shard ${{ matrix.shard }}/3
+        shell: bash
+        run: |
+          files=$(npx tsx tools/heavy-shards.ts --shard=${{ matrix.shard }}/3)
+          echo "attempt ${{ matrix.attempt }}, shard ${{ matrix.shard }}/3: $files"
+          npx vitest run --no-file-parallelism $files --reporter=default --reporter=json --outputFile.json=heavy-${{ matrix.attempt }}-shard-${{ matrix.shard }}.json
       - if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: heavy-${{ matrix.attempt }}
-          path: heavy-${{ matrix.attempt }}.json
+          name: heavy-${{ matrix.attempt }}-shard-${{ matrix.shard }}
+          path: heavy-${{ matrix.attempt }}-shard-${{ matrix.shard }}.json
           if-no-files-found: error
           overwrite: true
   # The Bridge under load on each store, in a job of its own (plan §4.1): the report names the backend the store object
@@ -906,8 +918,9 @@ jobs:
               [ -f "$f" ] && node -e "const r=require('./$f'); console.log('- ' + r.store + ': ' + r.proposals + ' proposals, ' + r.perSecond + '/s, p95 ' + r.latencyMs.p95 + ' ms, gaps ' + r.gaps + ', commit ' + String(r.commit).slice(0, 12))"
             done
             echo '### Solver (heavy, per attempt)'
-            for f in artifacts/heavy-*/heavy-*.json; do
-              [ -f "$f" ] && node -e "const r=require('./$f'); const t=r.testResults.flatMap(x=>x.assertionResults); console.log('- ' + '$f'.split('/').pop() + ': ' + r.numPassedTests + '/' + r.numTotalTests + ' passed, ' + Math.round(t.reduce((s,x)=>s+(x.duration||0),0)/1000) + ' s of tests')"
+            # Each attempt rebuilt from its three shards (4.5.7, #392); a shard missing: the attempt is not measured.
+            for a in 1 2 3; do
+              node -e "const fs=require('fs'); const rs=[1,2,3].map(s=>'artifacts/heavy-$a-shard-'+s+'/heavy-$a-shard-'+s+'.json').map(f=>fs.existsSync(f)?JSON.parse(fs.readFileSync(f,'utf8')):null); if (rs.some(r=>!r)) { console.log('- heavy-$a: not measured (' + rs.map((r,i)=>r?null:'shard '+(i+1)).filter(Boolean).join(', ') + ' missing)'); process.exit(0); } const t=rs.flatMap(r=>r.testResults.flatMap(x=>x.assertionResults)); const sum=k=>rs.reduce((s,r)=>s+r[k],0); console.log('- heavy-$a: ' + sum('numPassedTests') + '/' + sum('numTotalTests') + ' passed, ' + Math.round(t.reduce((s,x)=>s+(x.duration||0),0)/1000) + ' s of tests in three shards')"
             done
             echo '### Mutation (input hash, score)'
             for f in artifacts/mutation-*/.cache/mutation/report-*.json; do
@@ -923,7 +936,7 @@ jobs:
             for f in artifacts/bridge-load-*/load-median-*.json; do
               [ -f "$f" ] && node -e "const r=require('./$f'); for (const k of ['proposals','leaderboard']) console.log('- ' + r.store + ' ' + k + ', three loads: median p95 ' + r[k].medianMs + ' ms (' + r[k].minMs + '–' + r[k].maxMs + ')' + (r[k].baseline && r[k].baseline.ratio ? ', ×' + r[k].baseline.ratio + ' the baseline' : '') + (r[k].alert ? ' ⚠' : ''))"
             done
-            for a in candidate-release candidate-pack candidate-sbom candidate-image candidate-remix heavy-1 heavy-2 heavy-3 bridge-load-sqlite bridge-load-postgres backup-memory-sqlite backup-memory-postgres deployment-smoke; do [ -d "artifacts/$a" ] || echo "- $a"; done
+            for a in candidate-release candidate-pack candidate-sbom candidate-image candidate-remix $(for a in 1 2 3; do for s in 1 2 3; do echo heavy-$a-shard-$s; done; done) bridge-load-sqlite bridge-load-postgres backup-memory-sqlite backup-memory-postgres deployment-smoke; do [ -d "artifacts/$a" ] || echo "- $a"; done
           } >> "$GITHUB_STEP_SUMMARY"
       # Who wrote the manifest (4.1.19, plan §6.5): signed by this run, after every job succeeded. A Field Kit bundle
       # carries the attestation, so anyone can check it offline (npm run field:verify-bundle).

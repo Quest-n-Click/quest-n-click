@@ -37,11 +37,20 @@ describe('the candidate baseline', () => {
 
   it('reads every artifact it knows and the run jobs, without measuring again', () => {
     dir = mkdtempSync(join(tmpdir(), 'baseline-'));
-    put('heavy-1/heavy-1.json', {
-      numPassedTests: 9,
-      numTotalTests: 9,
-      testResults: [{ assertionResults: [{ duration: 1500 }, { duration: 2500 }] }],
+    // Each attempt in three shards (4.5.7, #392): attempt 1 whole, attempt 2 without its shard 3, attempt 3 absent.
+    const shard = (passed: number, skipped: number, ms: number[]) => ({
+      numPassedTests: passed,
+      numTotalTests: passed + skipped,
+      numPendingTests: skipped,
+      testResults: [{ assertionResults: ms.map((duration) => ({ duration })) }],
     });
+    put('heavy-1-shard-1/heavy-1-shard-1.json', shard(3, 0, [1500]));
+    put('heavy-1-shard-2/heavy-1-shard-2.json', shard(4, 1, [1000, 500]));
+    put('heavy-1-shard-3/heavy-1-shard-3.json', shard(2, 0, [1000]));
+    put('heavy-2-shard-1/heavy-2-shard-1.json', shard(3, 0, [1500]));
+    put('heavy-2-shard-2/heavy-2-shard-2.json', shard(4, 1, [1000]));
+    // A report of the old shape (one per attempt, until 4.5.6) is not read as an attempt.
+    put('heavy-3/heavy-3.json', { numPassedTests: 1, numTotalTests: 1, testResults: [] });
     put('bridge-load-sqlite/bridge-load-sqlite.json', {
       proposals: 50000,
       perSecond: 370,
@@ -134,8 +143,12 @@ describe('the candidate baseline', () => {
       version: '4.1.19',
       run: '42',
     });
-    expect(b.heavy[0]).toEqual({ attempt: 1, passed: 9, total: 9, skipped: 0, seconds: 4 });
+    // The three shards summed: 9 of 10 passed, 1 skipped, 4 s of tests.
+    expect(b.heavy[0]).toEqual({ attempt: 1, shards: 3, passed: 9, total: 10, skipped: 1, seconds: 4 });
+    // A shard missing: the attempt is not measured, never counted on part of the suite.
     expect(b.heavy[1]).toEqual({ attempt: 2, measured: false });
+    expect(b.heavy[2]).toEqual({ attempt: 3, measured: false });
+    expect(b.heavy).toHaveLength(3);
     expect(b.load.sqlite.proposals.perSecond).toBe(370);
     expect(b.load.postgres.proposals).toBe(NOT_MEASURED);
     expect(b.load.postgres.medians).toBe(NOT_MEASURED);
@@ -190,6 +203,8 @@ describe('the candidate baseline', () => {
     expect(md).toContain('# Baseline 4.1.19 — candidate 42');
     expect(md).toContain(`*${NOT_MEASURED}*`);
     expect(md).toContain('| core | passed | 10/10 |');
+    expect(md).toContain('| Heavy suite, attempt 1 | 9/10 passed, 1 skipped, 4 s of tests in 3 shards |');
+    expect(md).toContain(`| Heavy suite, attempt 2 | *${NOT_MEASURED}* |`);
   });
 
   it('refuses a qualification of another commit: never a figure of an earlier candidate (4.1.20, plan §8.5)', () => {

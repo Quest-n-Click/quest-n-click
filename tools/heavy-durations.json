@@ -1,0 +1,14 @@
+{
+  "about": "Each heavy test file in milliseconds (the median of the reports), for the shards of candidate.yml (tools/heavy-shards.ts).",
+  "durations": {
+    "tests/audit.test.ts": 837000,
+    "tests/canonical.test.ts": 96300,
+    "tests/checkpoint-matrix.test.ts": 302800,
+    "tests/dominance.test.ts": 305700,
+    "tests/memo.test.ts": 79300,
+    "tests/ownership.test.ts": 106000,
+    "tests/partition.test.ts": 408700,
+    "tests/reference-proof.test.ts": 136200,
+    "tests/solver-oracle.test.ts": 338700
+  }
+}

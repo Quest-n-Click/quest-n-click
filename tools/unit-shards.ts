@@ -50,16 +50,22 @@ export function byDuration(files: readonly string[], durations: Record<string, n
 }
 
 /**
- * A shard's time as the split sees it: its files run `PARALLEL` at a time, and it cannot end before its longest file
- * (a two-minute file is the floor of its shard, whatever else it holds).
+ * A shard's time as the split sees it: its files run `parallel` at a time, and it cannot end before its longest file
+ * (a two-minute file is the floor of its shard, whatever else it holds). The heavy suite runs one file after the other
+ * (`parallel` 1, tools/heavy-shards.ts): a shard's time is then the sum of its files.
  */
-export const shardTime = (longest: number, total: number) => Math.max(longest, total / PARALLEL);
+export const shardTime = (longest: number, total: number, parallel = PARALLEL) => Math.max(longest, total / parallel);
 
 /**
  * The files in `count` shards of about the same time (`shardTime`): the longest file first, each to the shard it
  * leaves the shortest, the one with the least work on a tie. The same answer whatever order the files come in.
  */
-export function assignShards(files: readonly string[], durations: Record<string, number>, count: number): string[][] {
+export function assignShards(
+  files: readonly string[],
+  durations: Record<string, number>,
+  count: number,
+  parallel = PARALLEL,
+): string[][] {
   const fallback = median(Object.values(durations));
   const cost = (f: string) => durations[f] ?? fallback;
   const shards: string[][] = Array.from({ length: count }, () => []);
@@ -68,8 +74,8 @@ export function assignShards(files: readonly string[], durations: Record<string,
   for (const f of byDuration(files, durations)) {
     let best = 0;
     for (let i = 1; i < count; i++) {
-      const t = shardTime(Math.max(longest[i]!, cost(f)), total[i]! + cost(f));
-      const b = shardTime(Math.max(longest[best]!, cost(f)), total[best]! + cost(f));
+      const t = shardTime(Math.max(longest[i]!, cost(f)), total[i]! + cost(f), parallel);
+      const b = shardTime(Math.max(longest[best]!, cost(f)), total[best]! + cost(f), parallel);
       if (t < b || (t === b && total[i]! < total[best]!)) best = i;
     }
     shards[best]!.push(f);

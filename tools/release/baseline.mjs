@@ -32,15 +32,19 @@ const seconds = (a, b) => (a && b ? Math.round((Date.parse(b) - Date.parse(a)) /
 /** Every measure of one candidate, from its artifacts (`dir`) and its jobs (`jobs`: the API's `jobs` array). */
 export function collect({ dir, sha, run, version, root = '.', jobs = null, env = process.env, now = new Date() }) {
   const q = json(join(root, 'tests/quality-baseline.json'));
+  // Each attempt rebuilt from its three shards (4.5.7, #392; until 4.5.6 one report per attempt, `heavy-<n>`): a
+  // shard missing and the attempt is not measured, never counted on part of the suite.
   const heavy = [1, 2, 3].map((i) => {
-    const r = json(join(dir, `heavy-${i}`, `heavy-${i}.json`));
-    if (!r) return { attempt: i, measured: false };
-    const tests = r.testResults.flatMap((x) => x.assertionResults);
+    const rs = [1, 2, 3].map((s) => json(join(dir, `heavy-${i}-shard-${s}`, `heavy-${i}-shard-${s}.json`)));
+    if (rs.some((r) => !r)) return { attempt: i, measured: false };
+    const sum = (f) => rs.reduce((s, r) => s + f(r), 0);
+    const tests = rs.flatMap((r) => r.testResults.flatMap((x) => x.assertionResults));
     return {
       attempt: i,
-      passed: r.numPassedTests,
-      total: r.numTotalTests,
-      skipped: (r.numPendingTests ?? 0) + (r.numTodoTests ?? 0),
+      shards: rs.length,
+      passed: sum((r) => r.numPassedTests),
+      total: sum((r) => r.numTotalTests),
+      skipped: sum((r) => (r.numPendingTests ?? 0) + (r.numTodoTests ?? 0)),
       seconds: Math.round(tests.reduce((s, x) => s + (x.duration || 0), 0) / 1000),
     };
   });
@@ -209,7 +213,8 @@ export function collect({ dir, sha, run, version, root = '.', jobs = null, env =
 
 /** What each family runs (candidate.yml), so a figure says which command made it. */
 export const COMMANDS = {
-  heavy: 'npm run test:heavy',
+  heavy:
+    'npm run test:heavy, each attempt in three shards: npx vitest run --no-file-parallelism $(npx tsx tools/heavy-shards.ts --shard=<i>/3)',
   load: 'npm run bridge:load -- --store=<sqlite|postgres://…>; npm run runs:load -- --runs=100000 --max-p95-ms=2000 --max-rss-mb=512',
   mutation: 'npm run test:mutation:core -- --set=<set>',
   qualification:
@@ -286,7 +291,7 @@ export function toMarkdown(b) {
   L.push(`| Player's first visit (KB of JS, gzipped) | ${cell(b.playerFirstVisitKB)} |`);
   for (const h of b.heavy)
     L.push(
-      `| Heavy suite, attempt ${h.attempt} | ${h.passed === undefined ? cell(NOT_MEASURED) : `${h.passed}/${h.total} passed, ${h.skipped} skipped, ${h.seconds} s of tests`} |`,
+      `| Heavy suite, attempt ${h.attempt} | ${h.passed === undefined ? cell(NOT_MEASURED) : `${h.passed}/${h.total} passed, ${h.skipped} skipped, ${h.seconds} s of tests in ${h.shards} shards`} |`,
     );
   L.push('', '## The Bridge', '', '| Store | Proposals | Leaderboard |', '|---|---|---|');
   for (const [s, v] of Object.entries(b.load)) {

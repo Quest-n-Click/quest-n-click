@@ -307,7 +307,9 @@ const waitUntil: Handler<'waitUntil'> = async (eng, c, ctx) => {
 
 const startScript: Handler<'startScript'> = (eng, c) => {
   const s = eng.state;
-  if (!eng.scriptDef(c.startScript)) throw new Error(`unknown script: ${c.startScript}`);
+  const def = eng.scriptDef(c.startScript);
+  if (!def) throw new Error(`unknown script: ${c.startScript}`);
+  if (def.route) return eng.world.start(def.id);
   (s.scripts ??= {})[c.startScript] = { pc: 0 };
   if (eng.autoScripts && !eng.scheduler.has(c.startScript)) {
     const global = !!eng.game.scripts?.some((x) => x.id === c.startScript);
@@ -496,6 +498,16 @@ export const HANDLERS: Handlers = {
   startScript,
   stopScript: (eng, c) => {
     eng.scriptState(c.stopScript).off = true;
+  },
+  suspendScript: (eng, c) => {
+    if (!eng.scriptDef(c.suspendScript)) throw new Error(`unknown script: ${c.suspendScript}`);
+    eng.scriptState(c.suspendScript).paused = true;
+  },
+  resumeScript: (eng, c) => {
+    const def = eng.scriptDef(c.resumeScript);
+    if (!def) throw new Error(`unknown script: ${c.resumeScript}`);
+    if (def.route) return eng.world.resume(def.id);
+    delete eng.scriptState(c.resumeScript).paused;
   },
   switchPlayer,
   transfer: (eng, c) => eng.transfer(c.transfer[0], c.transfer[1]),

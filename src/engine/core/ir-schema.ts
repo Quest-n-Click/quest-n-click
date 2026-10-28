@@ -198,7 +198,26 @@ const script = z.strictObject({
   trigger: z.enum(['world', 'enter', 'intro']),
   while: condSchema.optional(),
   loop: z.boolean().optional(),
-  do: cmds,
+  // A route (4.6.0, ADR 0031) has no `do`: its steps, each with its arrival commands.
+  do: cmds.optional(),
+  manual: z.boolean().optional(),
+  route: z
+    .strictObject({
+      who: id,
+      from: id,
+      steps: z.array(
+        z.strictObject({
+          id,
+          walk: id.optional(),
+          wait: z.number().optional(),
+          exit: id.optional(),
+          face: z.enum(['left', 'right']).optional(),
+          pose: z.string().optional(),
+          do: cmds.optional(),
+        }),
+      ),
+    })
+    .optional(),
   stepIds: z.array(id).optional(),
 });
 

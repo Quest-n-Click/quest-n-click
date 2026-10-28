@@ -179,7 +179,11 @@ export async function replay(
                     ? e.teleport(en.enter)
                     : 'external' in en
                       ? e.receive(en.external).then(() => undefined)
-                      : Promise.resolve();
+                      : 'world' in en
+                        ? Promise.resolve(e.world.pass(en.world))
+                        : 'routeDo' in en
+                          ? e.world.runDo(en.routeDo)
+                          : Promise.resolve();
     await settle(e, run, pending, errors);
     played++;
     opts.onEntry?.(i, e);

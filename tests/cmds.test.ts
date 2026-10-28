@@ -72,6 +72,8 @@ const instances: Record<CmdKey, Cmd> = {
   custom: { custom: 'zap' },
   startScript: { startScript: 'tick' },
   stopScript: { stopScript: 'tick' },
+  suspendScript: { suspendScript: 'tick' },
+  resumeScript: { resumeScript: 'tick' },
   launch: { launch: { target: 'valise', to: [300, 320] } },
   spring: { spring: { target: 'valise' } },
   path: {

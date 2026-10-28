@@ -50,6 +50,8 @@ export async function advance(eng: Engine, id: Id): Promise<'ran' | 'blocked' | 
   eng.reads?.add(`script:${id}`);
   if (st.off) return 'off';
   if (st.done) return 'done';
+  // A route moves on the world's clock (core/route-runtime.ts), never a step at a time; a suspended script waits.
+  if (!def.do || st.paused) return 'blocked';
   if (eng.busyState.count > 0 || s.done) return 'blocked';
   const room = eng.room();
   if (def.while && !eng.cond(def.while, room.id)) {
@@ -110,7 +112,7 @@ export async function runScript(eng: Engine, id: Id, turn = false): Promise<bool
   let ran = false;
   for (let guard = 0; guard < 1000; guard++) {
     if (turn && ran) {
-      const c = eng.scriptDef(id)?.do[eng.scriptState(id).pc];
+      const c = eng.scriptDef(id)?.do?.[eng.scriptState(id).pc];
       if (typeof c === 'object' && 'wait' in c) return ran;
     }
     const r = await eng.advance(id);

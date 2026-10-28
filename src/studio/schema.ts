@@ -156,6 +156,8 @@ export const CMD_SPECS: Record<CmdKey, CmdSpec> = {
   custom: { label: 'Custom command', value: id('command'), extra: { args: opt({ k: 'json' }) } },
   startScript: { label: 'Start a script', value: id('script') },
   stopScript: { label: 'Stop a script', value: id('script') },
+  suspendScript: { label: 'Suspend a script', value: id('script') },
+  resumeScript: { label: 'Resume a script', value: id('script') },
   sfx: { label: 'Sound effect', value: id('sfx'), extra: { caption: opt({ k: 'text' }) } },
   music: { label: 'Music', value: { k: 'json' } },
   toast: { label: 'Toast', value: { k: 'text' }, extra: { id: opt(id()) } },

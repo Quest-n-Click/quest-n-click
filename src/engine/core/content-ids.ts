@@ -292,6 +292,15 @@ export function assignIds(source: GameDef, options: AssignOptions = {}): Assigne
     room: Id | undefined,
   ) => {
     list?.forEach((sc, i) => {
+      // A route's step ids are written by its author on each step (4.6.0); its arrival lists get their block ids.
+      if (sc.route) {
+        sc.route.steps.forEach((st, j) => {
+          const old = oldList?.[i]?.route?.steps[j]?.do;
+          const p = `${pathBase}scripts.${sc.id}.route.steps[${j}].do`;
+          walk(st.do, old, `${sc.id}.${st.id}`, p, p, room);
+        });
+        return;
+      }
       if (!sc.stepIds || sc.stepIds.length !== sc.do.length) {
         const local = new Namer();
         sc.stepIds = sc.do.map((c, j) => sc.stepIds?.[j] ?? (added++, local.take(stepIdFor(sc.id, c))));

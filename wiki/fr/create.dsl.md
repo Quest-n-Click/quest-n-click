@@ -132,6 +132,8 @@ Une commande est une clé de `CMD_KEYS` ; ses champs sont ceux du formulaire du 
 | `custom` | `{ custom: command, args?: … }` | Lance une commande personnalisée : ses effets déclarés, puis son code navigateur. |
 | `startScript` | `{ startScript: script }` | Démarre un script à sa première commande. |
 | `stopScript` | `{ stopScript: script }` | Arrête un script jusqu'à ce qu'il redémarre. |
+| `suspendScript` | `{ suspendScript: script }` | Suspend un script là où il en est : son étape, et pour une route sa position et l'attente restante, gardées pour `resumeScript`. |
+| `resumeScript` | `{ resumeScript: script }` | Reprend un script suspendu ; une route seulement quand son personnage est revenu dans la salle de son étape courante. |
 | `sfx` | `{ sfx: sfx, caption?: text }` | Joue un bruitage, avec une légende possible. |
 | `music` | `{ music: … }` | Change la musique : un morceau, empiler, dépiler, arrêter, une fois, ou un jingle. |
 | `toast` | `{ toast: text, id?: id }` | Affiche un court message en haut de l'écran. |

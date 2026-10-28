@@ -9,6 +9,7 @@ import type { Presenter } from './ports';
 import { SESSION_MAX } from './engine-shared';
 import { derive, newSeed, type Prng } from './prng';
 import { type ClockHost, EngineRunClock } from './run-clock';
+import type { World } from './route-runtime';
 
 /** What the session reads from its engine: the game, the state, the clock, the randomness, and whom it asks. */
 export interface SessionHost extends ClockHost {
@@ -17,6 +18,8 @@ export interface SessionHost extends ClockHost {
   clock: (() => number) | null;
   random: () => number;
   readonly ui: Pick<Presenter, 'choose' | 'openMap' | 'minigame'>;
+  /** The world's clock and routes (4.6.0): told of every entry and every sync point. */
+  readonly world?: World;
 }
 
 /** Hears the session's entries: `begin` when one opens (in the log's order), `end` when it closes. */
@@ -35,6 +38,8 @@ export interface OpenEntry {
   /** How far into its minigames' results (4.1.16). */
   gi: number;
   steps: number;
+  /** How far into its recorded world ticks (`wt`, 4.6.0). */
+  wi: number;
 }
 
 export class SessionLog {
@@ -102,7 +107,9 @@ export class SessionLog {
     this.session ??= this.newSession({ kind: 'load' });
     if (this.host.clock) entry.t = Math.round(this.host.clock() - this.t0);
     this.session.log.push(entry);
-    this.open.push({ entry, src: this.feed?.shift(), pi: 0, mi: 0, ri: 0, gi: 0, steps: 0 });
+    this.open.push({ entry, src: this.feed?.shift(), pi: 0, mi: 0, ri: 0, gi: 0, steps: 0, wi: 0 });
+    this.host.world?.sync();
+    this.host.world?.onBegin(entry);
     // Listeners first: what they read of the run clock is the state before this entry.
     for (const l of this.listeners) l.begin?.(entry);
     this.runClock.entry();
@@ -131,7 +138,9 @@ export class SessionLog {
   }
 
   end() {
+    this.host.world?.sync(true);
     const o = this.open.pop();
+    if (o) this.host.world?.onEnd(o.entry);
     if (o && this.digestOn) o.entry.digest = stateDigest(this.host.state);
     if (o) for (const l of this.listeners) l.end?.(o.entry);
   }
@@ -152,6 +161,7 @@ export class SessionLog {
     const o = this.cur;
     const fed = o?.src?.picks?.[o.pi];
     const i = fed !== undefined ? (o!.pi++, fed) : await this.host.ui.choose(options, who);
+    this.host.world?.sync();
     if (o) (o.entry.picks ??= []).push(i);
     return i;
   }
@@ -161,6 +171,7 @@ export class SessionLog {
     const o = this.cur;
     const fed = o?.src?.maps?.[o.mi];
     const p = fed !== undefined ? (o!.mi++, fed) : await this.host.ui.openMap(this.host.state);
+    this.host.world?.sync();
     if (o) (o.entry.maps ??= []).push(p);
     return p;
   }
@@ -195,6 +206,7 @@ export class SessionLog {
       r = typeof out === 'object' ? out.result : out;
       t = typeof out === 'object' ? out.transcript : undefined;
     }
+    this.host.world?.sync();
     if (o && r !== undefined) {
       const mg = (o.entry.mg ??= []);
       mg.push(r);

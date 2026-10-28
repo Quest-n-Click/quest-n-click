@@ -1,7 +1,7 @@
 // The catalogue of commands: the one place that knows every key of the `Cmd` union, which keys hold nested command
 // lists, which ones change the state and which ones carry text. The engine, the validator, the solver, the texts walker
 // and the content tools read it, so a new command is declared once here (the type check below refuses an unlisted one).
-import type { Cmd, GameDef, RoomDef } from './types';
+import type { Cmd, GameDef, RoomDef, ScriptDef } from './types';
 
 /** The discriminant key of every `Cmd` variant (a plain string is the hero's line). */
 export const CMD_KEYS = [
@@ -41,6 +41,8 @@ export const CMD_KEYS = [
   'custom',
   'startScript',
   'stopScript',
+  'suspendScript',
+  'resumeScript',
   'sfx',
   'music',
   'toast',
@@ -102,6 +104,8 @@ export const CHANGES: ReadonlySet<CmdKey> = new Set<CmdKey>([
   'custom',
   'startScript',
   'stopScript',
+  'suspendScript',
+  'resumeScript',
   'minigame',
   'phone',
   'ending',
@@ -182,6 +186,11 @@ export function changesState(list: Cmd[] | undefined): boolean {
   return someCmd(list, (_c, k) => k !== undefined && CHANGES.has(k));
 }
 
+/** A script's command lists: its `do`, or a route's arrival lists (4.6.0). */
+export function scriptLists(sc: ScriptDef): Cmd[][] {
+  return sc.do ? [sc.do] : sc.route.steps.flatMap((st) => (st.do ? [st.do] : []));
+}
+
 export interface CmdList {
   list: Cmd[];
   /** The path of the list, the convention of the translation tables (`room:house/on[2].do`, `rules/on[0].do`, `start/intro`). */
@@ -203,9 +212,9 @@ export function cmdLists(game: GameDef): CmdList[] {
     (r.on ?? []).forEach((x, i) => out.push({ list: x.do, path: `${P}on[${i}].do`, room: r, generated: !!x.exit }));
     for (const [actor, ts] of Object.entries(r.talk ?? {}))
       ts.forEach((t, i) => out.push({ list: t.do, path: `${P}talk.${actor}[${i}].do`, room: r }));
-    (r.scripts ?? []).forEach((sc) =>
-      out.push({ list: sc.do, path: `${P}scripts.${sc.id}.do`, room: r, script: true }),
-    );
+    (r.scripts ?? []).forEach((sc) => {
+      if (sc.do) out.push({ list: sc.do, path: `${P}scripts.${sc.id}.do`, room: r, script: true });
+    });
     (r.events ?? []).forEach((ev, i) => out.push({ list: ev.do, path: `${P}events[${i}].do`, room: r }));
     for (const [pid, p] of Object.entries(r.props ?? {}))
       for (const [an, a] of Object.entries(p.anims ?? {}))
@@ -213,7 +222,14 @@ export function cmdLists(game: GameDef): CmdList[] {
           out.push({ list: b, path: `${P}props.${pid}.anims.${an}.at[${k}]`, room: r });
   }
   (game.rules.on ?? []).forEach((x, i) => out.push({ list: x.do, path: `rules/on[${i}].do` }));
-  (game.scripts ?? []).forEach((sc) => out.push({ list: sc.do, path: `scripts.${sc.id}.do`, script: true }));
+  (game.scripts ?? []).forEach((sc) => {
+    if (sc.do) out.push({ list: sc.do, path: `scripts.${sc.id}.do`, script: true });
+    // A route's arrival commands (4.6.0): ordinary lists, run outside the route's own steps.
+    else
+      sc.route.steps.forEach((st, i) => {
+        if (st.do) out.push({ list: st.do, path: `scripts.${sc.id}.route.steps[${i}].do` });
+      });
+  });
   (game.events ?? []).forEach((ev, i) => out.push({ list: ev.do, path: `events[${i}].do` }));
   if (game.start.intro) out.push({ list: game.start.intro, path: 'start/intro' });
   return out;

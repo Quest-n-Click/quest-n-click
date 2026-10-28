@@ -160,6 +160,10 @@ export type Cmd =
   | { startScript: Id }
   /** Stops a script; `startScript` brings it back. */
   | { stopScript: Id }
+  /** Pauses a script where it is (4.6.0): its step, a route's position and the wait left are kept for `resumeScript`. */
+  | { suspendScript: Id }
+  /** Resumes a suspended script (4.6.0); a route only when its character is in the room of its current step. */
+  | { resumeScript: Id }
   // --- audio and effects
   /** `caption`: what the sound means, written for whoever cannot hear it (shown with the captions setting, translated). */
   | { sfx: Id; caption?: string }
@@ -485,9 +489,13 @@ export interface HintDef {
  * A script of the world: it runs on its own, without a player action, one command at a time, in the gaps between the
  * player's actions (never during one, a cutscene, a conversation or a minigame). A room's scripts run while the player
  * is in the room; the game's scripts run everywhere. Its position is saved: it resumes where it was.
+ * Since 4.6.0 a game's script can be a route instead (`RouteScriptDef`): a character's walk through rooms.
  * @public
  */
-export interface ScriptDef {
+export type ScriptDef = CmdScriptDef | RouteScriptDef;
+
+/** A script of commands (`do`), the only kind before 4.6.0. @public */
+export interface CmdScriptDef {
   /** Unique in the whole game. */
   id: Id;
   /** Runs only while this holds; when false, the script rewinds and waits. */
@@ -497,7 +505,52 @@ export interface ScriptDef {
   do: Cmd[];
   /** Stable id of each command in `do`, at the matching position (required by schema v3). */
   stepIds?: Id[];
+  route?: never;
+  manual?: never;
 }
+
+/**
+ * A route (4.6.0 "Routes", ADR 0031): one character walks from step to step, through rooms, on the world's clock, shown
+ * or not. Declared in `GameDef.scripts` only. The geometry stays in the layouts: a `walk` names a point of the room's
+ * layout (`Layout.points`), an `exit` one of the room's exits. The player's click on the character holds it until the
+ * action ends; a closed exit holds it until it opens. `while` false holds it where it is (it never rewinds).
+ * @public
+ */
+export interface RouteScriptDef {
+  /** Unique in the whole game. */
+  id: Id;
+  /** Walks only while this holds; when false, the character stops where it is and waits. */
+  while?: Cond;
+  /** Starts again from the first step after the last one (it must then end in `route.from`). */
+  loop?: boolean;
+  /** Starts only with `{ startScript }` (a detour, a scene's walk); otherwise it starts with the game. */
+  manual?: boolean;
+  route: RouteDef;
+  /** Derived from `route.steps` (their `id`s): the stable step ids the saves follow. */
+  stepIds?: Id[];
+  do?: never;
+}
+
+/** A route's character, the room it starts in and its steps. @public */
+export interface RouteDef {
+  /** The character (a `CharacterDef` with a `room`, and an actor in every room the route crosses). */
+  who: Id;
+  /** The room of the first step: the route starts, and resumes, only when the character is there. */
+  from: Id;
+  steps: RouteStep[];
+}
+
+/**
+ * One step of a route, with its stable `id`. `walk`: to a point of the room's layout. `wait`: so many milliseconds of
+ * the world's clock, facing a side or in a pose. `exit`: to one of the room's exits, through it when it is open (its `if`
+ * holds and its `locked` does not), into the room it leads to, at its entry. `do`: commands run once the step is done
+ * (arrived, waited, entered), one route's at a time and never during the player's action; the route goes on after them.
+ * @public
+ */
+export type RouteStep =
+  | { id: Id; walk: Id; do?: Cmd[] }
+  | { id: Id; wait: number; face?: 'left' | 'right'; pose?: string; do?: Cmd[] }
+  | { id: Id; exit: Id; do?: Cmd[] };
 
 /**
  * A listener: when `on` is emitted (`{ emit }`) and the condition holds, `do` runs. `once`: only the first time.

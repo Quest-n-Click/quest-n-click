@@ -248,6 +248,18 @@ const CMD_SAMPLES: Record<
       scripts: [{ id: 'tock', loop: true, do: [{ wait: 100 }, { if: { flag: 'n', lt: 2 }, then: [{ inc: 'n' }] }] }],
     },
   },
+  suspendScript: {
+    cmd: { suspendScript: 'tock' },
+    patch: {
+      scripts: [{ id: 'tock', loop: true, do: [{ wait: 100 }, { if: { flag: 'n', lt: 2 }, then: [{ inc: 'n' }] }] }],
+    },
+  },
+  resumeScript: {
+    cmd: { resumeScript: 'tock' },
+    patch: {
+      scripts: [{ id: 'tock', loop: true, do: [{ wait: 100 }, { if: { flag: 'n', lt: 2 }, then: [{ inc: 'n' }] }] }],
+    },
+  },
   sfx: { cmd: { sfx: 'click' } },
   music: { cmd: { music: { stop: true } } },
   toast: { cmd: { toast: 'Saved.' } },

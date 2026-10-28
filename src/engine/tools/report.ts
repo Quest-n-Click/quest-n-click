@@ -3,7 +3,7 @@
 // obtained but never used, characters with unreachable topics, long lines. Pure: runs in node and in the Studio.
 import { asLines, listText } from '../core/list-lines';
 import type { Cmd, Cond, GameDef, Id, Layout, RoomDef } from '../core/types';
-import { eachCmd, someCmd } from '../core/cmds';
+import { eachCmd, scriptLists, someCmd } from '../core/cmds';
 import { normalizeExits } from '../core/define';
 import { worldGraph } from './graph';
 import { localeStatus, type MinigameTexts } from './i18n';
@@ -80,7 +80,7 @@ function roomCmds(r: RoomDef): unknown[][] {
     ...Object.values(r.talk ?? {})
       .flat()
       .map((t) => t.do),
-    ...(r.scripts ?? []).map((s) => s.do),
+    ...(r.scripts ?? []).flatMap(scriptLists),
     ...(r.events ?? []).map((e) => e.do),
   ];
 }
@@ -100,7 +100,7 @@ export function report(
   const allCmds: unknown[][] = [
     game.start.intro ?? [],
     ...(game.rules.on ?? []).map((x) => x.do),
-    ...(game.scripts ?? []).map((s) => s.do),
+    ...(game.scripts ?? []).flatMap(scriptLists),
     ...(game.events ?? []).map((e) => e.do),
   ];
   for (const r of game.rooms) allCmds.push(...roomCmds(r));

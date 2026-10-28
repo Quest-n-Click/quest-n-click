@@ -101,6 +101,7 @@ import {
 } from './command-runtime';
 import { atomKey, HERO, SESSION_MAX, type Ctx, type Source, type TraceEntry } from './engine-shared';
 import { ScriptScheduler } from './scheduler';
+import { World } from './route-runtime';
 import { roomKey } from './keys';
 export { describeCmd } from './engine-shared';
 export type { Source, TraceEntry } from './engine-shared';
@@ -244,6 +245,8 @@ export class Engine {
   autoScripts = false;
   /** The running loops of the world's scripts and the generations that end them (4.1.5, `core/scheduler.ts`). */
   readonly scheduler = new ScriptScheduler(this);
+  /** The world's clock and its routes (4.6.0, core/route-runtime.ts): disabled in a game without routes. */
+  readonly world = new World(this);
 
   constructor(
     game: GameDef,
@@ -375,6 +378,7 @@ export class Engine {
   private dropGuide() {
     this.objectives.reset();
     this.busyState.reset();
+    this.world.reset();
     this.ui.guide(null);
     this.scheduler.next(true);
   }
@@ -588,6 +592,7 @@ export class Engine {
           const ap = this.approach(target, room);
           if (ap) {
             const end = await this.ui.walk(this.heroId(), ap, false);
+            this.world.sync();
             if (!end) {
               entry.aborted = true;
               return;
@@ -748,7 +753,6 @@ export class Engine {
     this.scheduler.start(session);
   }
 
-  /** Fires an event: moves the scripts waiting for it, then runs the listeners of the room, then of the game. */
   /**
    * A verified signal from the world outside (4.1.1): applied at most once, recorded in the session, saved with the
    * state. `busy`: the engine is running something (a dialogue, a cutscene, a minigame), deliver it again when idle.

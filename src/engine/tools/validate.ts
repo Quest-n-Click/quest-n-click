@@ -443,12 +443,18 @@ export function validate(gameIn: GameDef, layouts: Record<string, Layout>, opts:
       if (!inScript) warn(where, 'waitEvent outside the top level of a script does nothing');
       return;
     }
-    if ('startScript' in c) {
-      scriptRefs.push([c.startScript, where]);
-      return;
-    }
-    if ('stopScript' in c) {
-      scriptRefs.push([c.stopScript, where]);
+    const sref =
+      'startScript' in c
+        ? c.startScript
+        : 'stopScript' in c
+          ? c.stopScript
+          : 'suspendScript' in c
+            ? c.suspendScript
+            : 'resumeScript' in c
+              ? c.resumeScript
+              : undefined;
+    if (sref !== undefined) {
+      scriptRefs.push([sref, where]);
       return;
     }
     if ('custom' in c) {
@@ -562,6 +568,7 @@ export function validate(gameIn: GameDef, layouts: Record<string, Layout>, opts:
     list?.forEach((sc, i) => {
       const w = `${where}[${i}]`;
       if (!sc.id) err(w, 'script without id');
+      if (sc.route) return; // a route (4.6.0): validate/routes.ts
       if (game.schemaVersion === 3) {
         if (sc.stepIds?.length !== sc.do.length)
           err(w, `schema v3 script needs one stable step id per command (${sc.do.length} expected)`);

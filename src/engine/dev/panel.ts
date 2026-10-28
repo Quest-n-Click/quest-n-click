@@ -146,7 +146,7 @@ export class DevPanel {
       const sf = pane.addFolder({ title: 'Scripts', expanded: false });
       for (const sc of scripts) {
         const st = eng.scriptState(sc.id);
-        const row = { at: `${st.off ? 'stopped' : st.done ? 'done' : `${st.pc}/${sc.do.length}`}` };
+        const row = { at: `${st.off ? 'stopped' : st.done ? 'done' : `${st.pc}/${(sc.do ?? sc.route.steps).length}`}` };
         sf.addBinding(row, 'at', { label: sc.id, readonly: true });
         if (eng.autoScripts)
           sf.addButton({ title: st.off || st.done ? `▶ ${sc.id}` : `■ ${sc.id}` }).on(

@@ -138,6 +138,14 @@ export const CMD_DOCS: Record<CmdKey, Said> = {
   ],
   startScript: ['Starts a script from its first command.', 'Démarre un script à sa première commande.'],
   stopScript: ['Stops a script until it is started again.', "Arrête un script jusqu'à ce qu'il redémarre."],
+  suspendScript: [
+    'Suspends a script where it is: its step, and a route its position and the wait left, kept for `resumeScript`.',
+    "Suspend un script là où il en est : son étape, et pour une route sa position et l'attente restante, gardées pour `resumeScript`.",
+  ],
+  resumeScript: [
+    'Resumes a suspended script; a route only when its character is back in the room of its current step.',
+    'Reprend un script suspendu ; une route seulement quand son personnage est revenu dans la salle de son étape courante.',
+  ],
   sfx: ['Plays a sound effect, with an optional caption.', 'Joue un bruitage, avec une légende possible.'],
   music: [
     'Changes the music: a track, push, pop, stop, once or a stinger.',

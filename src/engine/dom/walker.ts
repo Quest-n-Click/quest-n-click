@@ -27,12 +27,16 @@ export interface WalkScene {
 export class Walker {
   private topology!: WalkTopology;
   private tokens = new Map<Id, number>();
+  /** Where each character on a route is going, as the world's clock last said (4.6.0), and whether it walks. */
+  private tracks = new Map<Id, { to: Point; walking: boolean; flip?: boolean }>();
+  private gliding = false;
 
   constructor(private scene: WalkScene) {}
 
   /** A room just built: its floor. */
   enter(layout: Layout, room: RoomDef) {
     this.topology = new WalkTopology(layout, room);
+    this.untrack();
   }
   zoneAt(p: Point) {
     return this.topology?.zoneAt(p) ?? null;
@@ -42,6 +46,55 @@ export class Walker {
   }
   clamp(p: Point): Point {
     return this.topology.clamp(p);
+  }
+
+  /**
+   * A character on a route (4.6.0): the world's clock moved it to `to` (core/route-runtime.ts), and the view glides
+   * there at the walking speed, with the walk pose while it walks. It ends a walk of the same entity in progress.
+   */
+  track(id: Id, to: Point, walking: boolean, facing?: 'left' | 'right') {
+    const e = this.scene.ent(id);
+    if (!e) return;
+    this.tokens.set(id, (this.tokens.get(id) ?? 0) + 1);
+    this.tracks.set(id, { to, walking, ...(facing ? { flip: facing === 'left' } : {}) });
+    if (!this.gliding) this.glide();
+  }
+  /** A room left or built again: no glide goes on. */
+  untrack() {
+    this.tracks.clear();
+  }
+
+  private glide() {
+    this.gliding = true;
+    let last = performance.now();
+    const frame = (now: number) => {
+      const dt = Math.min(0.25, (now - last) / 1000);
+      last = now;
+      for (const [id, t] of this.tracks) {
+        const e = this.scene.ent(id);
+        if (!e) {
+          this.tracks.delete(id);
+          continue;
+        }
+        const sp = this.scene.sprites(e) ?? {};
+        const dx = t.to[0] - e.x,
+          dy = t.to[1] - e.y,
+          d = Math.hypot(dx, dy);
+        // Never more than a tick behind the clock: a glide that lags jumps to where the character is.
+        const k = d > 40 ? 1 : Math.min(1, (WALK_SPEED * 1.25 * dt) / (d || 1));
+        e.x += dx * k;
+        e.y += dy * k;
+        if (t.flip !== undefined) e.flip = t.flip;
+        else if (Math.abs(dx) > 1) e.flip = dx < 0;
+        const moving = t.walking || d > 1;
+        e.over = moving && sp.walk ? 'walk' : undefined;
+        this.scene.draw(e);
+        if (!t.walking && d <= 1) this.tracks.delete(id);
+      }
+      if (this.tracks.size) requestAnimationFrame(frame);
+      else this.gliding = false;
+    };
+    requestAnimationFrame(frame);
   }
 
   /** Walks along the path. Returns the arrival point, or null if interrupted by another walk. */

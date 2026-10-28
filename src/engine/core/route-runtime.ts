@@ -26,7 +26,7 @@ const STOP_GUARD = (10 * 60 * 1000) / WORLD_TICK_MS;
 export class World {
   /** Routes held by the player's action on their character, until that action ends (never saved). */
   private holds = new Map<SessionEntry, Id>();
-  private frozenBy = new Map<FreezeReason, number>();
+  private frozenBy = new Set<FreezeReason>();
   private topologies = new Map<Id, WalkTopology>();
   /** What a route refused (a resume or a start away from its room): the solver and the tests read them. */
   readonly diagnostics: string[] = [];
@@ -49,20 +49,19 @@ export class World {
   }
 
   // ------------------------------------------------------------------ freezing (the player's app)
+  /** Each reason is on or off (a cutscene told twice that it starts is still one cutscene). */
   freeze(reason: FreezeReason): void {
-    this.frozenBy.set(reason, (this.frozenBy.get(reason) ?? 0) + 1);
+    this.frozenBy.add(reason);
   }
   thaw(reason: FreezeReason): void {
-    const n = (this.frozenBy.get(reason) ?? 0) - 1;
-    if (n > 0) this.frozenBy.set(reason, n);
-    else this.frozenBy.delete(reason);
+    this.frozenBy.delete(reason);
   }
   get frozen(): boolean {
     return this.frozenBy.size > 0;
   }
   /** Why it stands still now, in the order the reasons were set. */
   get reasons(): FreezeReason[] {
-    return [...this.frozenBy.keys()];
+    return [...this.frozenBy];
   }
 
   // ------------------------------------------------------------------ time passing

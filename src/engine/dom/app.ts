@@ -74,6 +74,7 @@ import { DomPresenter } from './presenter';
 import { objectivesMenu as objectivesMenuImpl } from './objectives-menu';
 import type { SpeedrunSession } from './speedrun-ui';
 import type { Renderer } from '../scene/frame';
+import { startWorld } from './world-loop';
 export type { Settings } from './settings';
 
 export interface AppOptions {
@@ -114,6 +115,8 @@ export class App {
   /** Every listener this player puts on the window or the document ends with it (`destroy`, 4.1.4). */
   readonly aborter = new AbortController();
   private stopFps?: () => void;
+  /** Stops the world's clock on the frames (4.6.0, dom/world-loop.ts). */
+  private stopWorld?: () => void;
   /** @internal Read by the modules of dom/ (4.1.0). */
   mg: Record<Id, Minigame>;
   /** @internal The sealed ending (the presenter's `ending` opens it). */
@@ -353,6 +356,7 @@ export class App {
       if (e.kind === 'flagChanged' && this.view.room) this.view.redraw();
     });
     this.engine.digestOn = true;
+    this.stopWorld = startWorld(this);
     try {
       const raw = localStorage.getItem(`${o.game.id}.settings`);
       if (raw) this.settings = { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
@@ -396,6 +400,7 @@ export class App {
   destroy(): void {
     this.aborter.abort();
     this.stopFps?.();
+    this.stopWorld?.();
     this.view.destroy();
     this.audio.dispose();
     void this.reality?.stop?.();

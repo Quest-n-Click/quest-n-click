@@ -9,6 +9,8 @@ import { stateDigest } from '@engine/core/diff';
 import { WORLD_TICK_MS } from '@engine/core/timing';
 import type { Point } from '@engine/core/types';
 import { replay } from '@engine/tools/replay';
+import { compileGame } from '@engine/core/define';
+import { parseSave, saveEnvelope } from '@engine/core/save';
 import { routesGame, routesLayouts } from './fixtures/routes';
 
 /** A presenter whose waits let the world's clock run, as the player's frames do while a line is said or a walk lasts. */
@@ -238,5 +240,26 @@ describe('saves and replays', () => {
     const r = await replay(routesGame(), routesLayouts, e.session!);
     expect(r.divergedAt).toBeUndefined();
     expect(stateDigest(r.state)).toBe(stateDigest(e.state));
+  });
+
+  it('a save made before routes loads, and the routes begin from it; a step that disappeared is dropped (G8)', async () => {
+    const { e } = await make();
+    const old = structuredClone(e.state);
+    delete old.world;
+    old.scripts = {};
+    const g = compileGame(routesGame());
+    const warns: string[] = [];
+    const loaded = parseSave(g, saveEnvelope(g, old), { warn: (m) => warns.push(m) });
+    expect(warns).toEqual([]);
+    const b = new Engine(routesGame(), routesLayouts, new FakePresenter(), new MemoryStore());
+    await b.load(loaded);
+    b.world.tick(5);
+    expect(b.state.world).toBe(5);
+    expect(b.state.actors['yard.guard']?.x).toBeGreaterThan(100);
+    const gone = structuredClone(b.state);
+    gone.scripts!.rounds = { pc: 9, step: 'gone', route: { on: true } };
+    const fixed = parseSave(g, saveEnvelope(g, gone), { warn: (m) => warns.push(m) });
+    expect(fixed.scripts?.rounds).toBeUndefined();
+    expect(warns.join()).toMatch(/state.scripts/);
   });
 });

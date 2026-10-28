@@ -2,7 +2,7 @@
 // walk, never the action (lint `walk-link-gate` keeps the rules honest); each zone its own depth scale.
 import { describe, expect, it } from 'vitest';
 import type { GameDef, Layout } from '@engine/core/types';
-import { WalkTopology } from '@engine/dom/walk';
+import { WalkTopology } from '@engine/core/nav/walk';
 import { lintContent } from '@engine/tools/lint';
 import { game as fixture, layouts as fixtureLayouts } from './fixture';
 
@@ -104,5 +104,14 @@ describe('lint: a gated link and the rules behind it', () => {
     const f = lintContent(g, { ...fixtureLayouts, [r.id]: L }).findings.filter((x) => x.code === 'walk-link-gate');
     expect(f).toHaveLength(1);
     expect(f[0].message).toContain('"chimney" stands behind the walk link "ladder"');
+  });
+});
+
+describe('one path finder for the view and the simulation (4.6.0)', () => {
+  it('the player imports the very classes of the core', async () => {
+    const dom = await import('@engine/dom/walk');
+    const core = await import('@engine/core/nav/walk');
+    expect(dom.WalkTopology).toBe(core.WalkTopology);
+    expect(dom.WalkArea).toBe(core.WalkArea);
   });
 });

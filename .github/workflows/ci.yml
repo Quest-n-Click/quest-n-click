@@ -1259,11 +1259,77 @@ jobs:
         with:
           name: e2e-heroes
           path: /tmp/e2e-heroes
+  # The routes example (4.6.0, games/routes): its own build, proved, then played on the world's clock in Chromium and
+  # WebKit: Lou held while Pixel talks to him, the world frozen by the menu, his absence off screen, Continue in the
+  # middle of his rounds, a shut door that holds him. Gate: `reference` (games/routes reads the reference chapter's
+  # cast, rooms and rules).
+  routes:
+    needs: [plan, check]
+    runs-on: ubuntu-24.04
+    # Playwright's image (#261): the browsers and their system libraries are in it, so no apt mirror on the way
+    # (`--with-deps` fetched 52 MB of fonts and libraries, at 50 kB/s on a bad day). Its version is the lockfile's
+    # (tests/ci-plan.test.ts). Root in it: Firefox wants HOME to be root's. A spared job runs on the runner.
+    container:
+      image: ${{ fromJSON(needs.plan.outputs.plan).reference && 'mcr.microsoft.com/playwright:v1.64.1-noble@sha256:47b510dd9230bf0b9bfc9b20102241e577ea7a99334ab4c3ca19f19770e9b8ea' || '' }}
+      options: --init --ipc=host
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, webkit]
+    env:
+      HOME: /root
+      GAME: routes
+      RUN: ${{ fromJSON(needs.plan.outputs.plan).reference }}
+    steps:
+      - if: env.RUN != 'true'
+        run: echo "::notice::routes not needed by the plan (nothing the routes example plays changed)"
+      - if: env.RUN == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - if: env.RUN == 'true'
+        # In the container the checkout belongs to the runner's user, not root: git is told it is safe. `$(pwd)`, the
+        # step's directory, is the workspace as the container mounts it (`/__w/…`); `github.workspace` is the host's path.
+        run: git config --global --add safe.directory "$(pwd)"
+      - if: env.RUN == 'true'
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      - if: env.RUN == 'true'
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
+        with:
+          python-version: '3.12'
+      - if: env.RUN == 'true'
+        run: for i in 1 2 3; do (timeout 6m python -m pip install --require-hashes -r requirements.txt) && break; [ "$i" = 3 ] && exit 1; echo "retry $i"; sleep 15; done
+        timeout-minutes: 20
+      - if: env.RUN == 'true'
+        run: for i in 1 2 3; do (timeout 6m npm ci) && break; [ "$i" = 3 ] && exit 1; echo "retry $i"; sleep 15; done
+        timeout-minutes: 20
+      # validate --release measures the stems with ffprobe (3.6).
+      - if: env.RUN == 'true'
+        run: bash scripts/ci-ffmpeg.sh
+        timeout-minutes: 20
+      - if: env.RUN == 'true'
+        run: npm run build:game && npm run solve -- --prove
+      - if: env.RUN == 'true'
+        run: npm run preview -- --port 5178 &
+      - if: env.RUN == 'true'
+        run: for i in $(seq 1 60); do curl -sf http://127.0.0.1:5178/ > /dev/null && break; sleep 1; done
+      - if: env.RUN == 'true'
+        run: npm run e2e -- http://127.0.0.1:5178/ --game routes --prod
+        env:
+          E2E_OUT: /tmp/e2e-routes
+          E2E_BROWSER: ${{ matrix.browser }}
+      - if: failure() && env.RUN == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: e2e-routes-${{ matrix.browser }}
+          path: /tmp/e2e-routes
   # Every job's result in one check (4.1.9): each must be `success` (a job the plan spares succeeds in a step), mutation
   # may be `skipped` where it does not run (an ordinary pull request). The candidate single required check: the
   # ruleset still requires the seventeen names until a few runs of this job have been green (the maintainer's move).
   pr-gate:
-    needs: [plan, check, unit, coverage, mutation-plan, mutation, mutation-merge, reality-xcheck, connectors, bridge-postgres, studio-hosted, reality, node-24, windows, second-game, e2e, pwa-firefox, fresh-install, external-consumer, upgrade, reference, reference-fr, heroes, cross-runtime]
+    needs: [plan, check, unit, coverage, mutation-plan, mutation, mutation-merge, reality-xcheck, connectors, bridge-postgres, studio-hosted, reality, node-24, windows, second-game, e2e, pwa-firefox, fresh-install, external-consumer, upgrade, reference, reference-fr, heroes, routes, cross-runtime]
     if: always()
     runs-on: ubuntu-24.04
     timeout-minutes: 5

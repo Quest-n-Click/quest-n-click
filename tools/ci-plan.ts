@@ -42,7 +42,7 @@ export const JOB_OF: Record<Gate, string> = {
   coverage: 'coverage',
   node24: 'node-24',
   e2e: 'e2e (the six rows)',
-  reference: 'reference (chromium, webkit), reference-fr, heroes',
+  reference: 'reference (chromium, webkit), reference-fr, heroes, routes (chromium, webkit)',
   reality: 'reality-xcheck, connectors, reality (chromium, webkit)',
   pwaFirefox: 'pwa-firefox',
   windows: 'windows',
@@ -145,6 +145,7 @@ export const RULES: readonly Rule[] = [
   { re: /^games\/demo\//, gates: [...COVERAGE, 'e2e', 'reference', ...UNIT], why: 'the sample game' },
   { re: /^games\/reference\//, gates: [...COVERAGE, 'reference', 'node24'], why: 'the reference chapter' },
   { re: /^games\/heroes\//, gates: [...COVERAGE, 'reference', 'node24'], why: 'the hero choice example (its own job)' },
+  { re: /^games\/routes\//, gates: [...COVERAGE, 'reference', 'node24'], why: 'the routes example (its own job)' },
   // The Bridge's qualification profile (4.1.18): brought up by its own workflow (qualify.yml) and the candidate's
   // `deployment-smoke`; here its static test only.
   {

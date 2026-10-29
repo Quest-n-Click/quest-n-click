@@ -1,0 +1,17 @@
+{
+  "licences": {
+    "allow": [
+      "CC BY 4.0"
+    ]
+  },
+  "assets": [
+    {
+      "match": "img:*",
+      "source": "The sample game's art (games/demo/art, D13), reused for the routes example: image generation from the prompts in games/demo/prompts.md, sheets cut and cleaned by hand (npm run assets)",
+      "author": "Wano",
+      "licence": "CC BY 4.0",
+      "status": "final",
+      "note": "LICENSE-ASSETS: attribution \"Artwork by Wano, from the quest'n'click project, formerly web-scumm\""
+    }
+  ]
+}

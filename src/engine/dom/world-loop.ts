@@ -7,6 +7,8 @@ import type { App } from './app';
 
 /** The most of the world's time one frame may run: a slow frame loses the rest, never walks it at once. */
 const MAX_FRAME_MS = 250;
+/** The autosave keeps the routes' progress while the player only watches: every two seconds of the world's clock. */
+const SAVE_EVERY_TICKS = 2000 / WORLD_TICK_MS;
 
 /** Starts the clock on the frames; returns what stops it (the app's `destroy`). */
 export function startWorld(app: App): () => void {
@@ -16,6 +18,7 @@ export function startWorld(app: App): () => void {
   let last = performance.now();
   let raf = 0;
   let draining = false;
+  let savedAt = 0;
   const frame = (now: number) => {
     acc += Math.min(MAX_FRAME_MS, now - last);
     last = now;
@@ -23,6 +26,11 @@ export function startWorld(app: App): () => void {
     acc -= n * WORLD_TICK_MS;
     if (world.frozen) acc = 0;
     else if (n) world.tick(n);
+    // An action or a cutscene saves when it ends; between them, the walk the player watched is saved here.
+    if (!app.engine.busy && world.now() - savedAt >= SAVE_EVERY_TICKS) {
+      savedAt = world.now();
+      app.engine.save();
+    }
     // The arrival commands, when the engine is idle: one route's at a time, never during the player's action.
     if (!draining && !app.engine.busy && world.nextPending()) {
       draining = true;

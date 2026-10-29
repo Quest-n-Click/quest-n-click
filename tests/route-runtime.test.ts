@@ -260,6 +260,13 @@ describe('saves and replays', () => {
     gone.scripts!.rounds = { pc: 9, step: 'gone', route: { on: true } };
     const fixed = parseSave(g, saveEnvelope(g, gone), { warn: (m) => warns.push(m) });
     expect(fixed.scripts?.rounds).toBeUndefined();
+    // A v2-like state without a step id: past the route's steps, dropped too; within them, kept.
+    const far = structuredClone(b.state);
+    far.scripts!.rounds = { pc: 99, route: { on: true } };
+    far.scripts!.pace = { pc: 1, route: { on: true } };
+    const kept = parseSave(g, saveEnvelope(g, far), { warn: () => {} });
+    expect(kept.scripts?.rounds).toBeUndefined();
+    expect(kept.scripts?.pace).toMatchObject({ pc: 1 });
     expect(warns.join()).toMatch(/state.scripts/);
   });
 });

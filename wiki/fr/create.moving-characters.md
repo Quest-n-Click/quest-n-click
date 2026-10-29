@@ -2,7 +2,9 @@
 
 Faire marcher un personnage tout seul : un garde qui patrouille dans une salle, une infirmière qui va d'une salle à
 l'autre et attrape le héros, Papi qui rentre chez lui une fois la clé trouvée. Tout ici est le DSL tel qu'il est : un
-script, `walk`, `moveActor`, un événement et des conditions.
+script, `walk`, `moveActor`, un événement et des conditions. Pour un personnage dont la tournée continue d'une salle à
+l'autre pendant que le joueur est ailleurs, et qui s'arrête quand on lui parle, utilisez une route (4.6.0,
+[Routes](create.routes.md)).
 
 <a name="what-you-get"></a>
 

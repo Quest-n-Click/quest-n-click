@@ -143,7 +143,11 @@ subcommand directly.
   - two or more values of the hero's flag that no hero variant matches, so those heroes look like the written one
     (`hero-looks-default`, info, 4.3.0; see [Heroes](create.heroes.md));
   - a target behind a walk link a condition closes, whose rule does not check that condition (`walk-link-gate`: the
-    link stops the walk, never the action).
+    link stops the walk, never the action);
+  - routes (4.6.0, [Routes](create.routes.md)): a script or a rule that moves a character whose route may be running
+    (`route-script-conflict`), a `manual` route nothing starts (`route-never-starts`), and an exit a route waits at
+    whose condition nothing can make true (`route-blocked-forever`, an error). After a solver run, a resume or a start
+    away from the route's room (`route-resume-misplaced`, an error).
 
   After a solver run, also: a required signal's fallback the closed witness never plays (`fallback-unplayed`, a
   warning); a live action the witness never ran and a room it never entered (`rule-never-run`,

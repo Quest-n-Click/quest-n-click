@@ -148,7 +148,12 @@ elles suivent directement la sous-commande.
   - deux valeurs ou plus du flag du héros qu'aucune variante de héros ne reconnaît, si bien que ces héros ressemblent
     à celui qui est écrit (`hero-looks-default`, info, 4.3.0 ; voir [Héros](create.heroes.md)) ;
   - une cible derrière un lien de marche fermé par une condition, dont la règle ne vérifie pas cette condition
-    (`walk-link-gate` : le lien arrête la marche, jamais l'action).
+    (`walk-link-gate` : le lien arrête la marche, jamais l'action) ;
+  - les routes (4.6.0, [Routes](create.routes.md)) : un script ou une règle qui déplace un personnage dont la route peut
+    tourner (`route-script-conflict`), une route `manual` que rien ne démarre (`route-never-starts`), et une sortie
+    devant laquelle une route attend et dont rien ne peut rendre la condition vraie (`route-blocked-forever`, une
+    erreur). Après un passage du solveur, une reprise ou un démarrage hors de la salle de la route
+    (`route-resume-misplaced`, une erreur).
 
   Après une exécution du solveur, aussi : un fallback de signal requis que le témoin du monde fermé ne joue jamais
   (`fallback-unplayed`, un avertissement) ; une action vivante que le témoin n'a jamais jouée et un lieu où il n'est

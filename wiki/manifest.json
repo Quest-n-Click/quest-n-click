@@ -1162,6 +1162,26 @@
       "owner": "@wanoo"
     },
     {
+      "id": "install.upgrade-notes-4-6",
+      "domain": "install",
+      "type": "reference",
+      "audience": ["author"],
+      "context": ["created-project"],
+      "title": { "en": "Upgrade notes: 4.6", "fr": "Notes de mise à jour : 4.6" },
+      "url": { "en": "EN-Install-Upgrade-Notes-4-6", "fr": "FR-Installer-Notes-Mise-A-Jour-4-6" },
+      "state": "ready",
+      "versions": { "appliesFrom": "4.6.0" },
+      "sources": ["CHANGELOG.md", "docs/dev/adr/0031-npc-routes.md"],
+      "replaces": [],
+      "questions": { "en": [], "fr": [] },
+      "aliases": { "en": ["Routes"], "fr": ["Routes"] },
+      "keywords": { "en": ["4.6.0", "routes"], "fr": ["4.6.0", "routes"] },
+      "identifiers": [],
+      "related": ["install.upgrade", "install.upgrade-notes-4-5", "create.routes"],
+      "prerequisites": [],
+      "owner": "@wanoo"
+    },
+    {
       "id": "install.upgrade-notes-4-4",
       "domain": "install",
       "type": "reference",
@@ -2333,11 +2353,60 @@
         "fr": ["garde", "infirmière", "actorIn", "walk who"]
       },
       "identifiers": ["moveActor", "actorIn", "where"],
-      "related": ["create.scripts-events", "create.classics", "create.chapters"],
+      "related": ["create.scripts-events", "create.classics", "create.chapters", "create.routes"],
       "prerequisites": ["create.scripts-events"],
       "claims": [
         {"id": "patrol-turn-by-turn", "test": "tests/classics.test.ts › the patrolling nurse › catches the hero turn by turn: entering her room, or her entering his"},
         {"id": "patrol-solved", "test": "tests/classics.test.ts › the patrolling nurse › is proven by the solver, which waits for her to leave"}
+      ],
+      "owner": "@wanoo"
+    },
+    {
+      "id": "create.routes",
+      "domain": "create",
+      "type": "howto",
+      "audience": ["author"],
+      "context": ["engine-repo", "created-project"],
+      "title": { "en": "Routes: a character's rounds through rooms", "fr": "Routes : la tournée d'un personnage à travers les salles" },
+      "url": { "en": "EN-Create-Routes", "fr": "FR-Creer-Routes" },
+      "state": "ready",
+      "versions": { "appliesFrom": "4.6.0" },
+      "sources": [
+        "src/engine/core/route-runtime.ts",
+        "src/engine/core/nav/walk.ts",
+        "src/engine/dom/world-loop.ts",
+        "src/engine/tools/validate/routes.ts",
+        "src/engine/tools/lint-routes.ts",
+        "games/routes/game.ts",
+        "tests/route-runtime.test.ts",
+        "tests/route-solve.test.ts"
+      ],
+      "replaces": [],
+      "questions": {
+        "en": ["I want a character to do rounds through several rooms", "How do I make the player wait until the guard is gone?", "Can an NPC keep walking when the player is in another room?"],
+        "fr": ["Je veux qu'un personnage fasse une tournée dans plusieurs salles", "Comment faire attendre le joueur jusqu'à ce que le garde soit parti ?", "Un PNJ peut-il continuer à marcher quand le joueur est dans une autre salle ?"]
+      },
+      "aliases": {
+        "en": ["route", "NPC routine", "itinerary", "schedule"],
+        "fr": ["route", "routine de PNJ", "itinéraire", "tournée"]
+      },
+      "keywords": {
+        "en": ["suspendScript", "resumeScript", "points", "world clock", "detour"],
+        "fr": ["suspendScript", "resumeScript", "points", "horloge du monde", "détour"]
+      },
+      "identifiers": ["suspendScript", "resumeScript", "RouteScriptDef", "RouteStep", "RouteDef", "points"],
+      "related": ["create.moving-characters", "create.scripts-events", "create.geometry", "create.solver-proofs"],
+      "prerequisites": ["create.moving-characters"],
+      "claims": [
+        {"id": "routes-clock-steps", "test": "tests/route-runtime.test.ts › the world clock › n ticks at once are n single ticks (G2), whatever the split"},
+        {"id": "routes-offscreen", "test": "tests/route-runtime.test.ts › a route › progress is the same whether its room is shown or not (G3)"},
+        {"id": "routes-hold", "test": "tests/route-runtime.test.ts › the player and a route › a click on the character holds it from the click to the end of the action; the others go on (G4)"},
+        {"id": "routes-shut-door", "test": "tests/route-runtime.test.ts › a route › a closed exit holds it before the door; it goes through the tick after it opens (G5)"},
+        {"id": "routes-suspend", "test": "tests/route-runtime.test.ts › a route › a detour suspends the route; resuming it away from its room is refused and said (G6)"},
+        {"id": "routes-arrival", "test": "tests/route-runtime.test.ts › a route › its arrival commands wait for the engine to be idle, then run one at a time as their own input (G7)"},
+        {"id": "routes-saves", "test": "tests/route-runtime.test.ts › saves and replays › a save made before routes loads, and the routes begin from it; a step that disappeared is dropped (G8)"},
+        {"id": "routes-replay", "test": "tests/route-runtime.test.ts › saves and replays › a session whose actions overlap the clock replays to the same state (G9)"},
+        {"id": "routes-solver", "test": "tests/route-solve.test.ts › the solver and routes › proves the occasion stays open: no softlock however the rounds and the player interleave (G11)"}
       ],
       "owner": "@wanoo"
     },

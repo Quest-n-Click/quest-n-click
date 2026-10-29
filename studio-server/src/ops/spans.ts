@@ -96,7 +96,8 @@ function glob(key: string): Glob {
   const out: (string | '*' | '**' | '**/')[] = [];
   for (const part of key.split(/(\*\*\/?|\*)/)) {
     if (part === ANY_DIR || part === ANY || part === STAR) out.push(part);
-    else out.push(...part);
+    // By UTF-16 unit, as globMatch reads the path (`...part` would make a character outside the BMP one token).
+    else out.push(...part.split(''));
   }
   if (key.endsWith('/')) out.push(ANY);
   return out;

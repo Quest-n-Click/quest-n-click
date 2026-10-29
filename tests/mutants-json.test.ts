@@ -55,4 +55,9 @@ describe('an exemption of docs/dev/mutants.json', () => {
     const known = JSON.parse(readFileSync('docs/dev/mutants.json', 'utf8')) as KnownSurvivor[];
     for (const v of ['4.5.0-rc.1', '4.5.0', '4.5.9']) expect(checkKnown(known, v), v).toEqual([]);
   });
+
+  it('holds at 4.6.0, its pre-releases included: the 4.6.0 reread left no entry due (4.6.0)', () => {
+    const known = JSON.parse(readFileSync('docs/dev/mutants.json', 'utf8')) as KnownSurvivor[];
+    for (const v of ['4.6.0-rc.1', '4.6.0', '4.6.9']) expect(checkKnown(known, v), v).toEqual([]);
+  });
 });

@@ -14,7 +14,8 @@ export type Handle =
   | { t: 'prop-h'; id: Id }
   | { t: 'actor-pos'; id: Id }
   | { t: 'actor-h'; id: Id }
-  | { t: 'entry'; name: string }
+  /** An entry of the hero, or a route's point (`set: 'points'`, 4.6.0). */
+  | { t: 'entry'; name: string; set?: 'points' }
   | { t: 'walk'; hole: number; i: number }
   | { t: 'scale'; k: 0 | 1 }
   // The stage's geometry (3.4): walk zones and links, layers, occluders, lights, particle areas.
@@ -407,6 +408,11 @@ export class Overlay {
         E ? { t: 'entry', name } : undefined,
       );
       label(p[0] + 7, p[1] + 3, `entry ${name}`, '#ff6fb5');
+    }
+    // route points (4.6.0): where a character on a route walks to
+    for (const [name, p] of Object.entries(L.points ?? {})) {
+      dot(p, '#6fd3ff', E ? { t: 'entry', name, set: 'points' } : undefined, 5);
+      label(p[0] + 7, p[1] + 3, `point ${name}`, '#6fd3ff');
     }
   }
 }

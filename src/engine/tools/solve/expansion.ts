@@ -540,7 +540,7 @@ export function makeExpander(gameIn: GameDef, layouts: Record<string, Layout>, o
       // The world's scripts: letting one run until its next wait (or its end) is something the player can do by waiting.
       for (const sc of probe.scriptsHere()) {
         const st = s.scripts?.[sc.id];
-        if (st?.done || st?.off || !keys.live.actions.has(sc.id)) continue;
+        if (sc.route || st?.done || st?.off || !keys.live.actions.has(sc.id)) continue;
         add({
           label: `Script ${sc.id}`,
           run: (e) => e.runScript(sc.id, true).then(() => undefined),
@@ -548,6 +548,23 @@ export function makeExpander(gameIn: GameDef, layouts: Record<string, Layout>, o
           picks: [],
           rnd: [],
           candidates: [`script:${sc.id}`],
+        });
+      }
+      // A route (4.6.0): letting the world run until it reaches its next stop (a step done, a closed exit, another room),
+      // then its arrival commands. The other routes move meanwhile, as they would; their positions inside a walk are
+      // not part of the state (the proof is of the stops, ADR 0031).
+      for (const def of probe.world.routes) {
+        if (!probe.world.live(def)) continue;
+        add({
+          label: `Route ${def.id}`,
+          run: async (e) => {
+            e.world.untilStop(def.id);
+            for (let id = e.world.nextPending(); id; id = e.world.nextPending()) await e.world.runDo(id);
+          },
+          items: [],
+          picks: [],
+          rnd: [],
+          candidates: [`script:${def.id}`],
         });
       }
       // Signals from the world outside (4.1.1): what can arrive now, under the search's policy (solve/scenarios.ts).
@@ -646,6 +663,8 @@ export function makeExpander(gameIn: GameDef, layouts: Record<string, Layout>, o
       } finally {
         timing.run += now() - tRun;
       }
+      // A route refused to start or resume away from its room (4.6.0): an error of the game, with the way there.
+      for (const d of e.world.diagnostics) exp.errors.push(`${t.label} (${s.room}): ${d}`);
       const drawn = (e.session?.log ?? []).flatMap((entry) => entry.rnd ?? []);
       expand(t, ui.asked, drawn);
       countAnswer(t, src, s.room);

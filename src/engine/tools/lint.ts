@@ -13,6 +13,7 @@ import { listenerActionId, ruleActionId, topicActionId } from '../core/content-i
 import type { SolveResult } from './solve';
 import { must } from '../core/must';
 import { heroLooks, shownFlags } from './lint-hero';
+import { routeFindings } from './lint-routes';
 
 type Severity = 'error' | 'warning' | 'info';
 
@@ -442,6 +443,15 @@ export function lintContent(game: GameDef, layouts: Record<Id, Layout>, opts: Li
       }
     });
   }
+
+  // ---- routes (4.6.0): lint-routes.ts
+  out.push(
+    ...routeFindings(game, {
+      unsatisfiable: (c, room) => unsatisfiable(c, room, produced),
+      atomText,
+      diagnostics: opts.solve?.errors.flatMap((x) => /route-resume-misplaced: .*/.exec(x)?.[0] ?? []),
+    }),
+  );
 
   // ---- ignore list: `code`, `code:<id>`, `code:<room>/<path>`
   const ignore = new Set(opts.ignore ?? game.lint?.ignore ?? []);

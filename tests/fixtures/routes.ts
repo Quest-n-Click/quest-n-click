@@ -41,7 +41,7 @@ export function routesGame(): GameDef {
             verb: 'use',
             a: 'crate',
             if: { not: { actorIn: ['guard', 'shed'] } },
-            do: [{ gain: 'key' }],
+            do: [{ gain: 'key' }, { end: true }],
           },
         ],
       },

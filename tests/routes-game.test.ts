@@ -47,7 +47,7 @@ describe("Lou's Rounds", () => {
     expect(e.state.inventory).toContain('cable');
   });
 
-  it("waits at the kitchen door while Grandma mops, and goes in once it is dry", async () => {
+  it('waits at the kitchen door while Grandma mops, and goes in once it is dry', async () => {
     const e = await make();
     await e.script([{ suspendScript: 'chores' }, { set: 'mopping' }]);
     for (let i = 0; i < 1000 && !e.scriptState('rounds').route?.blocked; i++) e.world.tick(1);

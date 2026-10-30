@@ -91,7 +91,14 @@ export function startWorld(app: App): () => void {
     }
     raf = requestAnimationFrame(frame);
   };
-  raf = requestAnimationFrame(frame);
+  // The first frame waits for the routes' engine: a new game has its state before its first room loads that engine
+  // (core/movement.ts `enter`), and a tick without it throws, which would end the loop for good.
+  let stopped = false;
+  void world.ready().then(() => {
+    if (stopped) return;
+    last = performance.now();
+    raf = requestAnimationFrame(frame);
+  });
   const shown = (e: WorldEvent) => {
     const room = app.engine.state?.room;
     const view = app.view;
@@ -117,6 +124,7 @@ export function startWorld(app: App): () => void {
   document.addEventListener('visibilitychange', hidden);
   hidden();
   return () => {
+    stopped = true;
     cancelAnimationFrame(raf);
     world.listeners.delete(shown);
     document.removeEventListener('visibilitychange', hidden);

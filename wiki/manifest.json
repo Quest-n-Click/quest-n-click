@@ -2372,6 +2372,7 @@
       "state": "ready",
       "versions": { "appliesFrom": "4.6.0" },
       "sources": [
+        "src/engine/core/world.ts",
         "src/engine/core/route-runtime.ts",
         "src/engine/core/nav/walk.ts",
         "src/engine/dom/world-loop.ts",

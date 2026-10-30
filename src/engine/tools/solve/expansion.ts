@@ -1,5 +1,10 @@
 // Expansion: from a state, every action worth trying, run on the real engine, each one's transition and what it read and wrote (the no-op memo included).
 
+// The routes' engine (4.6.0), built at once by every engine the search makes (World.use).
+import { Routes } from '../../core/route-runtime';
+import { World } from '../../core/world';
+
+World.use(Routes);
 import { Engine, type Source } from '../../core/engine';
 import { FakePresenter, MemoryStore } from '../../core/ports';
 import { check } from '../../core/cond';
@@ -554,12 +559,12 @@ export function makeExpander(gameIn: GameDef, layouts: Record<string, Layout>, o
       // then its arrival commands. The other routes move meanwhile, as they would; their positions inside a walk are
       // not part of the state (the proof is of the stops, ADR 0031).
       for (const def of probe.world.routes) {
-        if (!probe.world.live(def)) continue;
+        if (!probe.world.runtime.live(def)) continue;
         add({
           label: `Route ${def.id}`,
           run: async (e) => {
-            e.world.untilStop(def.id);
-            for (let id = e.world.nextPending(); id; id = e.world.nextPending()) await e.world.runDo(id);
+            e.world.runtime.untilStop(def.id);
+            for (let id = e.world.nextPending(); id; id = e.world.nextPending()) await e.world.runtime.runDo(id);
           },
           items: [],
           picks: [],

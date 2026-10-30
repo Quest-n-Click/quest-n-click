@@ -153,7 +153,7 @@ mistakes before a person does. Every result stays reviewable, in the Studio and 
 Measured by the automated gates at the last baseline, rewritten at each release (`npm run quality:baseline`):
 <!-- metric:tests -->3708<!-- /metric --> unit test declarations, on Node 22 and 24, with coverage floors and gated
 mutation testing; the reference game proved in <!-- metric:referenceStates -->288<!-- /metric --> states; the player's
-first visit <!-- metric:initialJsKB -->139<!-- /metric --> KB of JavaScript, gzipped. Each release is built from the
+first visit <!-- metric:initialJsKB -->137<!-- /metric --> KB of JavaScript, gzipped. Each release is built from the
 commit its candidate tested. The candidate makes the four package archives, the Bridge's image, the SBOMs, the runs and
 the baseline, and the release publishes those very files; the release makes only the built game, its assets manifest,
 the proved Remix catalogues, the reference speedrun and the sums, from the same commit. Every file is published with

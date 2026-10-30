@@ -101,7 +101,7 @@ import {
 } from './command-runtime';
 import { atomKey, HERO, SESSION_MAX, type Ctx, type Source, type TraceEntry } from './engine-shared';
 import { ScriptScheduler } from './scheduler';
-import { World } from './route-runtime';
+import { World } from './world';
 import { roomKey } from './keys';
 export { describeCmd } from './engine-shared';
 export type { Source, TraceEntry } from './engine-shared';

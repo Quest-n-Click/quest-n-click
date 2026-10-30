@@ -64,6 +64,8 @@ export async function teleport(eng: Engine, id: Id): Promise<void> {
 // ------------------------------------------------------------------ rooms
 /** Enters a room: state, display, music, then arrival script. */
 export async function enter(eng: Engine, id: Id, at: Id | Point | undefined, runEnter: boolean) {
+  // The routes' engine, before a game that has routes plays its first room (4.6.0; nothing for one without).
+  await eng.world.ready();
   const room = eng.room(id);
   const from = eng.state.room;
   if (eng.state.room !== id || at !== undefined) eng.state.camera = { x: 0, follow: true };

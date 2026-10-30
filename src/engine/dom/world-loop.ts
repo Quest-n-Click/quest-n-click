@@ -1,14 +1,66 @@
 // The player's side of the world's clock (4.6.0 "Routes"): the frames tick it by whole ticks (core/route-runtime.ts),
 // the view shows what moved, and the clock stands still while the game is not being played: the pause menu, a
 // cutscene, a minigame, a room transition, the page hidden. No catching up: a hidden hour is not walked afterwards.
-import { WORLD_TICK_MS } from '../core/timing';
-import type { WorldEvent } from '../core/route-runtime';
+import { WALK_SPEED, WORLD_TICK_MS } from '../core/timing';
+import type { Id, Point } from '../core/types';
+import type { Walker } from './walker';
+import type { WorldEvent } from '../core/world';
 import type { App } from './app';
 
 /** The most of the world's time one frame may run: a slow frame loses the rest, never walks it at once. */
 const MAX_FRAME_MS = 250;
 /** The autosave keeps the routes' progress while the player only watches: every two seconds of the world's clock. */
 const SAVE_EVERY_TICKS = 2000 / WORLD_TICK_MS;
+
+/**
+ * The view's side of a route: the clock moved a character to `to`, and the view glides it there at the walking speed,
+ * with the walk pose while it walks, never more than a tick behind. A glide belongs to the room it started in.
+ */
+class Glide {
+  private tracks = new Map<Id, { room: Id; to: Point; walking: boolean; flip?: boolean }>();
+  private on = false;
+  constructor(
+    private walker: Walker,
+    private room: () => Id | undefined,
+  ) {}
+
+  track(room: Id, id: Id, to: Point, walking: boolean, facing?: 'left' | 'right') {
+    if (!this.walker.scene.ent(id)) return;
+    this.walker.stop(id);
+    this.tracks.set(id, { room, to, walking, ...(facing ? { flip: facing === 'left' } : {}) });
+    if (!this.on) this.run();
+  }
+
+  private run() {
+    this.on = true;
+    let last = performance.now();
+    const frame = (now: number) => {
+      const dt = Math.min(0.25, (now - last) / 1000);
+      last = now;
+      for (const [id, t] of this.tracks) {
+        const e = this.walker.scene.ent(id);
+        if (!e || t.room !== this.room()) {
+          this.tracks.delete(id);
+          continue;
+        }
+        const dx = t.to[0] - e.x,
+          dy = t.to[1] - e.y,
+          d = Math.hypot(dx, dy);
+        const k = d > 40 ? 1 : Math.min(1, (WALK_SPEED * 1.25 * dt) / (d || 1));
+        e.x += dx * k;
+        e.y += dy * k;
+        if (t.flip !== undefined) e.flip = t.flip;
+        else if (Math.abs(dx) > 1) e.flip = dx < 0;
+        e.over = (t.walking || d > 1) && this.walker.scene.sprites(e)?.walk ? 'walk' : undefined;
+        this.walker.scene.draw(e);
+        if (!t.walking && d <= 1) this.tracks.delete(id);
+      }
+      if (this.tracks.size) requestAnimationFrame(frame);
+      else this.on = false;
+    };
+    requestAnimationFrame(frame);
+  }
+}
 
 /** Starts the clock on the frames; returns what stops it (the app's `destroy`). */
 export function startWorld(app: App): () => void {
@@ -18,6 +70,7 @@ export function startWorld(app: App): () => void {
   let last = performance.now();
   let raf = 0;
   let draining = false;
+  const glide = new Glide(app.view.walker, () => app.view.room?.id);
   let savedAt = 0;
   const frame = (now: number) => {
     acc += Math.min(MAX_FRAME_MS, now - last);
@@ -44,7 +97,7 @@ export function startWorld(app: App): () => void {
     const view = app.view;
     if (!room || view.room?.id !== room) return;
     if (e.kind === 'moved') {
-      if (e.room === room) view.walker.track(e.actor, e.at, e.walking, e.facing);
+      if (e.room === room) glide.track(room, e.actor, e.at, e.walking, e.facing);
       return;
     }
     const r = app.engine.room(e.from === room ? e.from : e.to);

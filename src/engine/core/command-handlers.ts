@@ -309,7 +309,7 @@ const startScript: Handler<'startScript'> = (eng, c) => {
   const s = eng.state;
   const def = eng.scriptDef(c.startScript);
   if (!def) throw new Error(`unknown script: ${c.startScript}`);
-  if (def.route) return eng.world.start(def.id);
+  if (def.route) return eng.world.runtime.start(def.id);
   (s.scripts ??= {})[c.startScript] = { pc: 0 };
   if (eng.autoScripts && !eng.scheduler.has(c.startScript)) {
     const global = !!eng.game.scripts?.some((x) => x.id === c.startScript);
@@ -506,7 +506,7 @@ export const HANDLERS: Handlers = {
   resumeScript: (eng, c) => {
     const def = eng.scriptDef(c.resumeScript);
     if (!def) throw new Error(`unknown script: ${c.resumeScript}`);
-    if (def.route) return eng.world.resume(def.id);
+    if (def.route) return eng.world.runtime.resume(def.id);
     delete eng.scriptState(c.resumeScript).paused;
   },
   switchPlayer,

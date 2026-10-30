@@ -74,7 +74,6 @@ import { DomPresenter } from './presenter';
 import { objectivesMenu as objectivesMenuImpl } from './objectives-menu';
 import type { SpeedrunSession } from './speedrun-ui';
 import type { Renderer } from '../scene/frame';
-import { startWorld } from './world-loop';
 export type { Settings } from './settings';
 
 export interface AppOptions {
@@ -356,7 +355,11 @@ export class App {
       if (e.kind === 'flagChanged' && this.view.room) this.view.redraw();
     });
     this.engine.digestOn = true;
-    this.stopWorld = startWorld(this);
+    // The world's clock on the frames, loaded only by a game that has routes (4.6.0): the others' first visit stays as it was.
+    if (this.engine.world.enabled)
+      void import('./world-loop').then((m) => {
+        if (!this.aborter.signal.aborted) this.stopWorld = m.startWorld(this);
+      });
     try {
       const raw = localStorage.getItem(`${o.game.id}.settings`);
       if (raw) this.settings = { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };

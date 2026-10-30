@@ -9,7 +9,7 @@ import type { Presenter } from './ports';
 import { SESSION_MAX } from './engine-shared';
 import { derive, newSeed, type Prng } from './prng';
 import { type ClockHost, EngineRunClock } from './run-clock';
-import type { World } from './route-runtime';
+import type { World } from './world';
 
 /** What the session reads from its engine: the game, the state, the clock, the randomness, and whom it asks. */
 export interface SessionHost extends ClockHost {

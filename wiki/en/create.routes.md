@@ -203,7 +203,8 @@ keep where it is, and the solver proves the occasions it opens stay open.
 ## References
 
 - `docs/dev/adr/0031-npc-routes.md`, `docs/dev/PLAN-4.6-ROUTES.md`
-- `src/engine/core/route-runtime.ts` (the clock and the routes), `src/engine/core/nav/walk.ts` (the path finder),
+- `src/engine/core/world.ts` (the clock, loaded by every game), `src/engine/core/route-runtime.ts` (the routes, loaded
+  only by a game that has some), `src/engine/core/nav/walk.ts` (the path finder),
   `src/engine/dom/world-loop.ts` (the frames and the freezing)
 - `src/engine/tools/validate/routes.ts`, `src/engine/tools/lint-routes.ts`
 - `games/routes/` (the example), `tests/route-runtime.test.ts`, `tests/route-solve.test.ts`

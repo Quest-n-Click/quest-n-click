@@ -208,7 +208,8 @@ et les rejeux gardent l'endroit où il se trouve, et le solveur prouve que les o
 ## Références
 
 - `docs/dev/adr/0031-npc-routes.md`, `docs/dev/PLAN-4.6-ROUTES.md`
-- `src/engine/core/route-runtime.ts` (l'horloge et les routes), `src/engine/core/nav/walk.ts` (la recherche de chemin),
+- `src/engine/core/world.ts` (l'horloge, chargée par chaque jeu), `src/engine/core/route-runtime.ts` (les routes,
+  chargées seulement par un jeu qui en a), `src/engine/core/nav/walk.ts` (la recherche de chemin),
   `src/engine/dom/world-loop.ts` (les images et le gel)
 - `src/engine/tools/validate/routes.ts`, `src/engine/tools/lint-routes.ts`
 - `games/routes/` (l'exemple), `tests/route-runtime.test.ts`, `tests/route-solve.test.ts`

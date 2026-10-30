@@ -114,7 +114,7 @@ export const SETS = {
   ],
   // The world's clock and its routes (4.6.0, ADR 0031): the ticks, a route's steps, holds, shut exits, suspensions, the
   // arrival commands and the sync points a replay goes by.
-  routes: ['src/engine/core/route-runtime.ts'],
+  routes: ['src/engine/core/world.ts', 'src/engine/core/route-runtime.ts'],
   // The playable workshop (4.2.2, plan §2.8): the personal undo, the health by revision and its bisection, the previews
   // by revision, the published builds and their signed manifests, the prepared assets, the backup, the journal shipped
   // and the collection. Gated since 4.2.3 (PR 10): its survivors read one by one.
@@ -282,8 +282,8 @@ export const GATED: MutationSet[] = [
 // Empty in 4.1.20 (plan §7.5): every set was gated; a set added later is measured here until its survivors are read.
 // Empty again since 4.2.1: the Studio Server's two sets are gated. 4.2.2's workshop was measured here until 4.2.3
 // (PR 10) read its survivors.
-// 4.6.0: `routes` (the world's clock), 223 of its 264 mutants killed (tests/route-runtime-mutants.test.ts); measured
-// until its 41 survivors are read, most of them guards for what validate refuses (an actor missing in a room).
+// 4.6.0: `routes` (the world's clock), 223 of its 264 mutants killed (tests/route-runtime-mutants.test.ts) before the
+// facade moved into world.ts; measured until its survivors are read, most of them guards for what validate refuses.
 export const MEASURED: MutationSet[] = ['routes'];
 
 /**

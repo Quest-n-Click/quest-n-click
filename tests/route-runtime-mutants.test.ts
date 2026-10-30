@@ -4,7 +4,7 @@
 import { describe, expect, it } from 'vitest';
 import { Engine } from '@engine/core/engine';
 import { FakePresenter, MemoryStore } from '@engine/core/ports';
-import type { WorldEvent } from '@engine/core/route-runtime';
+import type { WorldEvent } from '@engine/core/world';
 import { WORLD_TICK_MS } from '@engine/core/timing';
 import type { GameDef, Layout, RouteScriptDef } from '@engine/core/types';
 import { replay } from '@engine/tools/replay';
@@ -45,9 +45,9 @@ describe('the clock', () => {
   it('untilStop says whether time passed: not for a route that cannot move', async () => {
     const { e } = await make(guardOnly());
     await e.script([{ suspendScript: 'rounds' }]);
-    expect(e.world.untilStop('rounds')).toBe(false);
+    expect(e.world.runtime.untilStop('rounds')).toBe(false);
     await e.script([{ resumeScript: 'rounds' }]);
-    expect(e.world.untilStop('rounds')).toBe(true);
+    expect(e.world.runtime.untilStop('rounds')).toBe(true);
     expect(e.session!.log.at(-1)).toMatchObject({ world: e.state.world });
   });
 
@@ -301,7 +301,7 @@ describe('arrival commands', () => {
     const { e } = await make(guardOnly());
     e.world.tick(60);
     expect(e.world.nextPending()).toBeNull();
-    await e.world.runDo('rounds');
+    await e.world.runtime.runDo('rounds');
     expect(e.session!.log.at(-1)).toEqual(expect.objectContaining({ routeDo: 'rounds' }));
     expect(e.session!.log.at(-1)?.ran).toBeUndefined();
   });
@@ -321,7 +321,7 @@ describe('the scenario', () => {
     const { e } = await make();
     for (let i = 0; i < 400 && e.state.where!.guard !== 'shed'; i++) e.world.tick(1);
     await e.script([{ suspendScript: 'rounds' }]);
-    expect(e.world.roomOf(route(routesGame(), 'rounds'), e.scriptState('rounds').pc)).toBe('shed');
+    expect(e.world.runtime.roomOf(route(routesGame(), 'rounds'), e.scriptState('rounds').pc)).toBe('shed');
     await e.script([{ moveActor: ['guard', 'yard'] }, { startScript: 'detour' }]);
     await e.script([{ moveActor: ['guard', 'shed'] }, { resumeScript: 'rounds' }]);
     expect(e.scriptState('rounds').paused).toBeUndefined();
@@ -357,12 +357,12 @@ describe('the player and the session', () => {
     const { e } = await make(guardOnly());
     e.digestOn = true;
     e.world.tick(4);
-    e.world.pass(20);
+    e.world.runtime.pass(20);
     e.world.tick(2);
     await e.act({ verb: 'look', a: 'guard' });
     const r = await replay(guardOnly(), routesLayouts, e.session!);
     expect(r.divergedAt).toBeUndefined();
     expect(r.state.world).toBe(e.state.world);
-    expect(() => e.world.untilStop('nope')).toThrow(/unknown route: nope/);
+    expect(() => e.world.runtime.untilStop('nope')).toThrow(/unknown route: nope/);
   });
 });

@@ -11,7 +11,8 @@ on arrival; a character changes room only by `moveActor`, at once. The admission
    Its steps walk to a named point of the room's layout (`Layout.points`, placed in the editor), wait a number of
    milliseconds, or go through one of the room's exits. A step's `do` runs once the step is done. The geometry stays
    in the layouts.
-2. **The world's clock** (`core/route-runtime.ts`) moves every route by whole ticks of 50 ms, whether its room is shown
+2. **The world's clock** (`core/world.ts`, with the routes' engine `core/route-runtime.ts`, which only a game with routes
+   downloads) moves every route by whole ticks of 50 ms, whether its room is shown
    or not. The player's frames tick it, and it is frozen while the game is not played: the menu, a cutscene, a
    minigame, a room transition, a hidden page. There is no catching up.
 3. **The navigation is shared.** `WalkArea` and `WalkTopology` move into `core/nav/`. The view glides a routed

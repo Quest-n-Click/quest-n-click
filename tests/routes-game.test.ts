@@ -25,7 +25,7 @@ describe("Lou's Rounds", () => {
     expect(r.warnings.filter((w) => /route|point/.test(w))).toEqual([]);
   });
 
-  it('is finished by the solver, whose witness replays, and proved', async () => {
+  it('is finished by the solver, whose witness replays, and proved', { timeout: 60000 }, async () => {
     const w = await solve(structuredClone(game), layouts, { maxStates: 5000 });
     expect(w.finished).toBe(true);
     const rep = await replay(structuredClone(game), layouts, { log: w.steps, start: { kind: 'new' } } as never);

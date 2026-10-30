@@ -18,6 +18,7 @@ import type {
   Migration,
   Point,
   RealityDef,
+  RouteDef,
   Rule,
   VerbId,
 } from './types';
@@ -119,7 +120,12 @@ export interface IrScript {
   trigger: 'world' | 'enter' | 'intro';
   while?: Cond;
   loop?: boolean;
-  do: Cmd[];
+  /** Absent from a route (4.6.0), whose steps carry their own arrival commands. */
+  do?: Cmd[];
+  /** A route that starts only with `startScript` (4.6.0). */
+  manual?: boolean;
+  /** A route (4.6.0, ADR 0031): its character, first room and steps, as written. */
+  route?: RouteDef;
   stepIds?: Id[];
 }
 
@@ -424,6 +430,8 @@ export function compileIR(game: CompiledGame, o: CompileIROptions): GameIR {
         while: s.while,
         loop: s.loop,
         do: s.do,
+        manual: s.manual,
+        route: s.route,
         stepIds: s.stepIds,
       }),
     );

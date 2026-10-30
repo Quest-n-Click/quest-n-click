@@ -64,7 +64,13 @@ export class DomPresenter implements Presenter {
     app.showLabel(null);
     this.guide(null);
     app.scene.style.visibility = 'hidden';
-    await app.view.build(room);
+    // The world waits while the room is built (4.6.0): no route walks during a transition.
+    app.engine.world.freeze('transition');
+    try {
+      await app.view.build(room);
+    } finally {
+      app.engine.world.thaw('transition');
+    }
     app.view.resize(app.u);
     app.scene.style.visibility = '';
     app.renderA11yTargets();
@@ -197,6 +203,8 @@ export class DomPresenter implements Presenter {
   cutscene(on: boolean) {
     const app = this.app;
     app.inCutscene = on;
+    if (on) app.engine.world.freeze('cutscene');
+    else app.engine.world.thaw('cutscene');
     app.scene.classList.toggle('cine', on);
     app.scene.querySelector('.skip')?.remove();
     if (on) {
@@ -232,6 +240,7 @@ export class DomPresenter implements Presenter {
     const host = el('div', 'overlay');
     host.style.background = '#000';
     app.scene.append(host);
+    app.engine.world.freeze('minigame');
     app.side.classList.add('off');
     const voice = app.engine.character(app.game.hintVoice ?? app.game.hero);
     let frame: HTMLElement | null = null;
@@ -281,6 +290,7 @@ export class DomPresenter implements Presenter {
         labels: { skip: app.game.ui.skip, jump: app.t('jump'), duck: app.t('duck') },
       });
     } finally {
+      app.engine.world.thaw('minigame');
       entry.ms = Math.round(performance.now() - t0);
       if (result) entry.result = result;
       app.minigameLog.push(entry);

@@ -1,0 +1,204 @@
+{
+  "format": "quest-n-click-docs-acks",
+  "version": 1,
+  "pairs": {
+    "create.checking#checking": {
+      "enHash": "aaa300926c187960df6ac74ec4233f8efca5ac1277fe0228dcb0a8ce9960615e",
+      "frHash": "0bbedbc927f3fdd3d1bb35eafeb0de56ae51c2324e1bfef086049516c0f7ab97",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "create.dsl#commands": {
+      "enHash": "b0e24207c3d2cac6119dbfcb4ecb084202b074fac1b09d2e994ff8e6d3901b7c",
+      "frHash": "cac99bcbea41bc9a40e2970050a59449e9e76677fce335fc9a63c7e4b679f351",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "create.moving-characters#_lead": {
+      "enHash": "fcf974c54eef7542c7e4d3b2a467a89c9a4da9f7237d48f7d7f9cce5e069a427",
+      "frHash": "896bc53e315ab243ef32e7f93ebb0ce171f55c0adc58eccd6000de8f0844e0ae",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "create.routes#_lead": {
+      "enHash": "b5fdf04d652adc56e4f1db79aa745b4adf3dd64e70b34e8d8623a017628c0a87",
+      "frHash": "93badf598fc33ee27c85d1bf5da4700d4e22e2459f635663dd3bf1e1daac0e30",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "create.routes#common-errors": {
+      "enHash": "d2e00ebf3e28f4b0be8df3982bbfdd8996924bdf5ddcdf1794a2c15ec9d6dce2",
+      "frHash": "0f5a3b6337a7fd7f0b2b17e372fc0c300edccdfbcfc9c4a21abba08da7684573",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "create.routes#context-and-versions": {
+      "enHash": "d17c969afb07db93e6fe62a713ad4c88e4f21c92e5066118860b6f7d8d331a9f",
+      "frHash": "0ed7dac4e1b8fb55c9a4caab67fa736e6a7547552f612c4e429668e8e8392dd5",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "create.routes#expected-result": {
+      "enHash": "5c71aacd687415c66201ab359a4bd39db4bc2c3430b614a63f7272a842805684",
+      "frHash": "52d562f34663f1adeb31430cc1ce54cad1d061784f0fb3beda73a82774c3f461",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "create.routes#files-changed": {
+      "enHash": "25bb059b76aa9bb3f639d853b67dca559e1a9f1701532dd5f4bdc9b97f4b5079",
+      "frHash": "00d4fe5d5a69678e0ebf92a1d88f9279c38e3ff2e6a6b99c0be8bb32edbdb355",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "create.routes#prerequisites": {
+      "enHash": "d05ba9ca1c647b3bb2b1093250fa7777a9dba6b7ca86e56d4dfe1291f718ed29",
+      "frHash": "390c59465925f3f54375894c8de79d4e3c37cde5267ef0d105c55b1effd2f9b8",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "create.routes#recovery": {
+      "enHash": "5072c97dd2c563056fa1287c56a9b7381bceb8c68c9e6dfad151f2bcea6a0906",
+      "frHash": "0c81f024e138c4a941c670aa516d5205e94ea7e77ff096d78f612a5f4b67c70e",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "create.routes#references": {
+      "enHash": "e9f8673366cf7f99d59a4f7a9509d4cbf17a7b1c7babbd835e6474f72eaf609f",
+      "frHash": "1ae2178b95dfeb460f22098bf9bcf234a88a36ff1b3b81e19ba66381ac6cabc1",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "create.routes#steps": {
+      "enHash": "ddca36a391d82f2ccbe2fa84a4bddf66e13b3adc1be5e00f4cedd61146bbc332",
+      "frHash": "7b9871c035dc9b5116688009391e30ee769f4b58adbd453fdc8cc1992d5ae0ed",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "create.routes#what-you-get": {
+      "enHash": "261214fe7190fff2a9016257e681ea321166dcb08fd398c8ad5cbdacbc5951d6",
+      "frHash": "08094890b06f500e0b5faa3a467c9b8f4b7f33241365182716edf074a1ce7a91",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "create.routes#where-to-run": {
+      "enHash": "0a51dca283cf719ff561c34423acae1a7233d8fcc7e1554b2be4eb2bf2141e6f",
+      "frHash": "d719b07073125d45fdd2c75730a7445ea4b72dc85ce3bad6da40cd2da4b6eba7",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "engine.api#content-reference": {
+      "enHash": "580af3c203e71d11e12d48092ea21662bf7f45195f891093d433aadb70a2393b",
+      "frHash": "244253b823ac6c260d757141d3f4bd839e3d5472b6e107d6fd52f011d058a3d1",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "install.upgrade-notes-4-6#_lead": {
+      "enHash": "a1487a5ce02ab5399500d2cd65baef68a54c72ec62cd787091254c8a3d59841b",
+      "frHash": "4134fc9650f70af3b57fa296e623c34a6e7c93c932b892eccbf0335fc5418dad",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "install.upgrade-notes-4-6#from-4-5-6-to-4-6-0": {
+      "enHash": "a4ad7bad31b343caa305d0ed09ff6543dfe8152b377fce56b1932483e807af73",
+      "frHash": "fc1ac3366bb5b0e87256c8538b5fc6385adf34fa2eb9b22277aacfb678558f71",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    }
+  },
+  "claims": {
+    "apply-replays-demo": {
+      "claimTextHash": "dd227a7a5f952741f1373909c80c8f1c9d134c07920923ed115d4af48d2b84d7",
+      "testFileHash": "5ca619689b7909fd1af5ab93e72733c2247dc1b5c7f72cabbadee9840984d0a6",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "closed-link-stops-walk": {
+      "claimTextHash": "a373ea1ee815a3413600862fdfba7b2df8e1eae657ee2cbf85d744becac660ef",
+      "testFileHash": "6fc418db385e68ea4889a88cf2e7e6409df1b66626f73b8c8ceec9997a8f7251",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "routes-arrival": {
+      "claimTextHash": "cf4b24f396aa28c8733ed2c6b98ecbe71e4ca1637630732892de1d65c86efcd0",
+      "testFileHash": "d35d94c7b16a6250b51b611c090dc9b57759e05ee9aeb38f21b5cbb505774433",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "routes-clock-steps": {
+      "claimTextHash": "adefc350eb2131279316316b0723c94bba9c13c14e60ba570763208d65a5b0b2",
+      "testFileHash": "d35d94c7b16a6250b51b611c090dc9b57759e05ee9aeb38f21b5cbb505774433",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "routes-hold": {
+      "claimTextHash": "495c2fb7d51051b5405dcd15814d4e2f86e20775fbcceb5a8801db9fc04e9b2c",
+      "testFileHash": "d35d94c7b16a6250b51b611c090dc9b57759e05ee9aeb38f21b5cbb505774433",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "routes-offscreen": {
+      "claimTextHash": "c84e8386ece8e31cd48d2391686ba7541637bbb779218c77f5cd5439af9cdeb2",
+      "testFileHash": "d35d94c7b16a6250b51b611c090dc9b57759e05ee9aeb38f21b5cbb505774433",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "routes-replay": {
+      "claimTextHash": "17da4619b05cd47a2a21c796332ff23a4db253433beaef570ec27b130f978208",
+      "testFileHash": "d35d94c7b16a6250b51b611c090dc9b57759e05ee9aeb38f21b5cbb505774433",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "routes-saves": {
+      "claimTextHash": "4ee620aa39493816ac71805cc19bb594f25e3b7542ea789d5f875cade488bccf",
+      "testFileHash": "d35d94c7b16a6250b51b611c090dc9b57759e05ee9aeb38f21b5cbb505774433",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "routes-shut-door": {
+      "claimTextHash": "4c5663b557cf4c7fff3309ca22fe1083ddf474b7dc1368853a547e8fbd4b0d78",
+      "testFileHash": "d35d94c7b16a6250b51b611c090dc9b57759e05ee9aeb38f21b5cbb505774433",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "routes-solver": {
+      "claimTextHash": "17b44f322fa6158d82c719ca3d5b4c4d381a78b62a3a175337faeb805b3c5000",
+      "testFileHash": "46117026590bf800a9a5d04539b745a55ef2ad4fb8affcc01da32de8366caf66",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    },
+    "routes-suspend": {
+      "claimTextHash": "9570f84c2ee96e01b8cdfa66c7dca39076fe93390f64c2d8378f5d872fde02b0",
+      "testFileHash": "d35d94c7b16a6250b51b611c090dc9b57759e05ee9aeb38f21b5cbb505774433",
+      "reviewers": [
+        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-10-29" }
+      ]
+    }
+  }
+}

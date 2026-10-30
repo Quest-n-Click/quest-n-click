@@ -130,6 +130,8 @@ A command is one key of `CMD_KEYS`; its fields are the Studio form’s. A plain 
 | `custom` | `{ custom: command, args?: … }` | Runs a custom command: its declared effects, then its browser code. |
 | `startScript` | `{ startScript: script }` | Starts a script from its first command. |
 | `stopScript` | `{ stopScript: script }` | Stops a script until it is started again. |
+| `suspendScript` | `{ suspendScript: script }` | Suspends a script where it is: its step, and a route its position and the wait left, kept for `resumeScript`. |
+| `resumeScript` | `{ resumeScript: script }` | Resumes a suspended script; a route only when its character is back in the room of its current step. |
 | `sfx` | `{ sfx: sfx, caption?: text }` | Plays a sound effect, with an optional caption. |
 | `music` | `{ music: … }` | Changes the music: a track, push, pop, stop, once or a stinger. |
 | `toast` | `{ toast: text, id?: id }` | Shows a short message at the top of the screen. |

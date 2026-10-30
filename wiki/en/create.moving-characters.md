@@ -2,7 +2,8 @@
 
 Make a character walk on its own: a guard who patrols a room, a nurse who goes from room to room and catches the hero,
 Grandpa who goes home once the key is found. Everything here is the DSL as it is: a script, `walk`, `moveActor`,
-an event, and conditions.
+an event, and conditions. For a character whose rounds go on through rooms while the player is elsewhere, and who
+stops when spoken to, use a route (4.6.0, [Routes](create.routes.md)).
 
 <a name="what-you-get"></a>
 

@@ -122,7 +122,14 @@ export function assignKeys(game: GameDef): GameDef {
     r.events?.forEach((ev, i) => walk(ev.do, `${r.id}:event${i}`));
   }
   game.rules.on?.forEach((rule, i) => walk(rule.do, `game:on${i}`));
-  game.scripts?.forEach((sc) => walk(sc.do, `game:script.${sc.id}`));
+  game.scripts?.forEach((sc) => {
+    walk(sc.do, `game:script.${sc.id}`);
+    // A route's step ids are its steps' (4.6.0): the saves follow them like a script's stable step ids.
+    if (sc.route) {
+      sc.stepIds = sc.route.steps.map((st) => st.id);
+      sc.route.steps.forEach((st) => walk(st.do, `game:route.${sc.id}.${st.id}`));
+    }
+  });
   game.events?.forEach((ev, i) => walk(ev.do, `game:event${i}`));
   walk(game.start.intro, 'game:intro');
   return game;

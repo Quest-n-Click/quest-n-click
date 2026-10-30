@@ -6,6 +6,7 @@ import { Overlay, type Handle } from './overlay';
 import { putLayout, roundLayout, studioOrigin } from './save-layout';
 import { mirrorControls } from './mirror';
 import { must } from '../core/must';
+import { pointsFolder } from './editor-points';
 
 type Drag = { h: Handle; start: Point; orig: unknown };
 
@@ -240,7 +241,7 @@ export class Editor {
       case 'actor-h':
         return L.actors![h.id];
       case 'entry':
-        return L.entries![h.name];
+        return L[h.set ?? 'entries']![h.name];
       case 'walk':
         return h.hole < 0 ? L.walk!.area[h.i] : must(L.walk!.holes![h.hole], 'walk hole of a handle')[h.i];
       case 'scale':
@@ -331,7 +332,7 @@ export class Editor {
         break;
       }
       case 'entry':
-        L.entries![h.name] = p;
+        L[h.set ?? 'entries']![h.name] = p;
         break;
       case 'walk':
         must(h.hole < 0 ? L.walk!.area : L.walk!.holes![h.hole], 'walk ring of a handle')[h.i] = p;
@@ -393,7 +394,7 @@ export class Editor {
       'id' in h
         ? `${h.t.startsWith('hs') || (h.t === 'approach' && h.kind === 'hs') ? 'hs' : h.t.startsWith('prop') || (h.t === 'approach' && h.kind === 'prop') ? 'prop' : 'actor'}:${h.id}`
         : h.t === 'entry'
-          ? `entry:${h.name}`
+          ? `${h.set === 'points' ? 'point' : 'entry'}:${h.name}`
           : h.t;
     this.overlay.o.selected = key;
     this.selected.item = key;
@@ -615,14 +616,12 @@ export class Editor {
       });
     }
 
-    const en = pane.addFolder({ title: 'Entry points', expanded: false });
-    const nu = { name: '' };
-    en.addBinding(nu, 'name');
-    en.addButton({ title: 'Add the entry point' }).on('click', () => {
-      if (!nu.name) return;
-      (this.L.entries ??= {})[nu.name] = [320, 360];
-      this.changed({ t: 'entry', name: nu.name }, true);
-    });
+    pointsFolder(
+      pane,
+      this.L,
+      (h, final) => this.changed(h, final),
+      () => this.overlay.draw(),
+    );
 
     const help = {
       text: "Drag: move. Corners: resize.\nSquare above a foot: height (or scroll wheel).\nDouble-click a zone edge: add a vertex.\nAlt-click a vertex: remove it.\nStage: layers, occluders, lights, particles,\nwalk zones and links (their logic: the Studio's Stage form).",

@@ -71,6 +71,9 @@ export function pauseMenu(app: App) {
     previousFocus?.focus();
   };
   cleanups.push(trapFocus(m, { onEscape: close, restore: false }));
+  // The world's routes stand still while the menu is open (4.6.0).
+  app.engine.world.freeze('menu');
+  cleanups.push(() => app.engine.world.thaw('menu'));
   // A speedrun's clock hears the pause (4.1.14): an interval its category's rules read.
   const run = app.speedrun;
   if (run) {

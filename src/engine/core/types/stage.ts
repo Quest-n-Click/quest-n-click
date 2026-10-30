@@ -85,6 +85,8 @@ export interface Layout {
   scale?: [[number, number], [number, number]];
   /** Hero entry points (at least `default`). */
   entries?: Record<Id, Point>;
+  /** Named points a route walks to (4.6.0, `RouteStep.walk`), placed in the editor like the entries. */
+  points?: Record<Id, Point>;
   hotspots?: Record<
     Id,
     { rect?: [number, number, number, number]; poly?: Point[]; approach?: Point; face?: 'left' | 'right' }

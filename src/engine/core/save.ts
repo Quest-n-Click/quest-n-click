@@ -38,8 +38,26 @@ const GameStateSchema = z.looseObject({
   used: opt(z.array(id)),
   where: opt(z.record(id, id)),
   scripts: opt(
-    z.record(id, z.looseObject({ pc: count(), step: opt(id), done: opt(z.boolean()), off: opt(z.boolean()) })),
+    z.record(
+      id,
+      z.looseObject({
+        pc: count(),
+        step: opt(id),
+        done: opt(z.boolean()),
+        off: opt(z.boolean()),
+        paused: opt(z.boolean()),
+        route: opt(
+          z.looseObject({
+            on: opt(z.literal(true)),
+            wait: opt(num()),
+            blocked: opt(z.literal(true)),
+            pending: opt(id),
+          }),
+        ),
+      }),
+    ),
   ),
+  world: opt(count()),
   camera: opt(z.looseObject({ x: num(), follow: z.boolean() })),
   active: opt(id),
   players: opt(
@@ -288,7 +306,11 @@ export function parseSave(game: GameDef, input: unknown, opts: ParseSaveOptions 
   );
   for (const [sid, st] of Object.entries(state.scripts ?? {})) {
     const def = scripts.get(sid);
-    if (!def || (st.step && def.stepIds && !def.stepIds.includes(st.step)) || (!st.step && st.pc > def.do.length)) {
+    if (
+      !def ||
+      (st.step && def.stepIds && !def.stepIds.includes(st.step)) ||
+      (!st.step && st.pc > (def.do ?? def.route.steps).length)
+    ) {
       delete state.scripts![sid];
       drop('state.scripts', sid);
     }

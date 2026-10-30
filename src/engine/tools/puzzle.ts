@@ -155,6 +155,10 @@ export function puzzleGraph(
         edge(action, node('script', c.startScript, `script ${c.startScript}`), 'produces', 'start');
       else if ('stopScript' in c)
         edge(action, node('script', c.stopScript, `script ${c.stopScript}`), 'consumes', 'stop');
+      else if ('suspendScript' in c)
+        edge(action, node('script', c.suspendScript, `script ${c.suspendScript}`), 'consumes', 'suspend');
+      else if ('resumeScript' in c)
+        edge(action, node('script', c.resumeScript, `script ${c.resumeScript}`), 'produces', 'resume');
       else if ('end' in c || 'ending' in c || 'reveal' in c) edge(action, node('end', 'end', 'the end'), 'produces');
       else if ('custom' in c) effects(action, opts.commands?.[c.custom]?.effects as Cmd[] | undefined, room);
     });

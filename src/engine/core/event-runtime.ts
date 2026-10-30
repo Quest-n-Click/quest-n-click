@@ -12,6 +12,7 @@ export async function emit(eng: Engine, id: Id, ctx: Ctx) {
   const s = eng.state;
   eng.log('event', `emit ${id}`);
   for (const def of [...(eng.game.scripts ?? []), ...eng.game.rooms.flatMap((r) => r.scripts ?? [])]) {
+    if (!def.do) continue; // a route never waits for an event (4.6.0)
     const st = eng.scriptState(def.id);
     eng.reads?.add(`script:${def.id}`);
     const cur = def.do[st.pc];

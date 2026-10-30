@@ -30,7 +30,8 @@ export class ScriptScheduler {
     this.next(session);
     if (!this.eng.autoScripts) return;
     for (const def of this.eng.room().scripts ?? []) this.launch(def.id, false);
-    if (session) for (const def of this.eng.game.scripts ?? []) this.launch(def.id, true);
+    // Routes move on the world's clock (4.6.0), not in a loop of their own.
+    if (session) for (const def of this.eng.game.scripts ?? []) if (def.do) this.launch(def.id, true);
   }
 
   /** Starts one script's loop in the current generation (a `startScript` command, auto mode). */

@@ -63,6 +63,7 @@ describe('the plan of a change', () => {
     ['the sample game', ['games/demo/rooms/x.ts'], gates('coverage', 'e2e', 'reference', 'node24', 'windows')],
     ['the reference chapter', ['games/reference/index.ts'], gates('coverage', 'reference', 'node24')],
     ['the hero choice example', ['games/heroes/e2e.mjs'], gates('coverage', 'reference', 'node24')],
+    ['the routes example', ['games/routes/e2e.mjs'], gates('coverage', 'reference', 'node24')],
     [
       'the template',
       ['games/_template/index.ts'],
@@ -292,6 +293,7 @@ describe('ci.yml and the plan', () => {
       'reference',
       'reference-fr',
       'heroes',
+      'routes',
       'pwa-firefox',
       'windows',
     ].concat(['second-game', 'fresh-install', 'upgrade'])) {
@@ -409,7 +411,7 @@ describe("Playwright's image (#261)", () => {
   const jobs = [...yml.matchAll(/^ {2}([\w-]+):\n[\s\S]*?(?=^ {2}[\w-]+:\n|$(?![\s\S]))/gm)].map((m) => m[0]);
 
   it("is the lockfile's Playwright, pinned by digest, in every Linux browser job but studio-hosted", () => {
-    expect(images.length).toBe(9);
+    expect(images.length).toBe(10);
     for (const m of images) expect(m[1]).toBe(lock.packages['node_modules/playwright']?.version);
     // Every mention of the image is one of those pinned ones.
     expect(yml.match(/mcr\.microsoft\.com\/playwright/g)?.length).toBe(images.length);
@@ -417,7 +419,7 @@ describe("Playwright's image (#261)", () => {
 
   it('a job in the image installs no browser and no system package', () => {
     const inImage = jobs.filter((j) => j.includes('mcr.microsoft.com/playwright'));
-    expect(inImage.length).toBe(9);
+    expect(inImage.length).toBe(10);
     for (const j of inImage) {
       expect(j).not.toMatch(/playwright install/);
       expect(j).toMatch(/HOME: \/root/);

@@ -1,6 +1,11 @@
 // Replay: runs a recorded session (`Engine.session`: the inputs since a new game, a save or a checkpoint, with the
 // answers given on the way) on a silent engine, and says where it stops matching the recording. A tester's bug report
 // is a save plus this log; the solver's solution is one too (`SolveResult.steps`), so the same function proves it.
+// The routes' engine (4.6.0), built at once by every engine the tool makes (World.use).
+import { Routes } from '../core/route-runtime';
+import { World } from '../core/world';
+
+World.use(Routes);
 import { Engine, type TraceEntry } from '../core/engine';
 import type { CustomCommands } from '../core/custom';
 import { FakePresenter, MemoryStore } from '../core/ports';
@@ -179,7 +184,11 @@ export async function replay(
                     ? e.teleport(en.enter)
                     : 'external' in en
                       ? e.receive(en.external).then(() => undefined)
-                      : Promise.resolve();
+                      : 'world' in en
+                        ? Promise.resolve(e.world.runtime.pass(en.world))
+                        : 'routeDo' in en
+                          ? e.world.runtime.runDo(en.routeDo)
+                          : Promise.resolve();
     await settle(e, run, pending, errors);
     played++;
     opts.onEntry?.(i, e);

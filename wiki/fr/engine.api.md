@@ -203,7 +203,8 @@ stabilité. `npx tsx tools/api-doc.ts` (`--check` pour seulement vérifier) la r
 | `CharacterDef` | `interface { name, description, color, height, sprites, portrait, … 11 more }` | public | A character: its name, dialogue colour, poses, mouths and portrait, its kinds, and the variants its state selects. |
 | `checkWheel` | `(w: CodeWheel): string[]` | public | The wheel's solution, checked the way a player reads it (turn, then read): a solution exists, it is unique (one rotation aligns the pair), a |
 | `Choice` | `interface { id, text, if, once, img, do }` | public | One answer the player may pick in a `{ choice }` command: its text, when it is offered, what it runs. |
-| `Cmd` | `type Cmd = union of 56` | public | A command. A plain string = the hero says this line. Command lists run in order, each one waiting for the previous one to finish. |
+| `Cmd` | `type Cmd = union of 58` | public | A command. A plain string = the hero says this line. Command lists run in order, each one waiting for the previous one to finish. |
+| `CmdScriptDef` | `interface { id, while, loop, do, stepIds, route, … 1 more }` | public | A script of commands (`do`), the only kind before 4.6.0. |
 | `CODE_WHEEL_VERSION` | `number` | public | The wheel's layout version: a stored record of another version is replayed as it is, never regenerated. |
 | `CodeWheel` | `interface { version, seed, n, outer, track, inner, … 3 more }` | public | A wheel as a seed makes it: the order of each disc, the windows' offsets, the question and its answer. |
 | `CodeWheelMode` | `type CodeWheelMode = 'parody' \| 'story' \| 'strict' \| 'cosmetic' \| 'disabled' \| 'daily'` | public | How the check behaves (§11.13): `parody` (the default) lets the player through after a few funny refusals. |
@@ -238,7 +239,7 @@ stabilité. `npx tsx tools/api-doc.ts` (`--check` pour seulement vérifier) la r
 | `GameIR` | `interface { schema, engine, gameId, world, rooms, entities, … 7 more }` | public | The intermediate representation of a game (schema 1): its logic as plain data, the provenance of its ids, the trusted extensions by name, an |
 | `GameRules` | `interface { fallbacks, kinds, on }` | public | The rules shared by every room: fallback responses per verb, reactions by kind, rules valid everywhere. |
 | `GameSource` | `type GameSource = GameDef` | public | A game as its sources write it: a `GameDef` before compilation. |
-| `GameState` | `interface { v, room, inventory, flags, props, actors, … 15 more }` | public | The state of a game in progress, serialised as-is in a save: room, inventory, flags, props, actors, counters, scripts. |
+| `GameState` | `interface { v, room, inventory, flags, props, actors, … 16 more }` | public | The state of a game in progress, serialised as-is in a save: room, inventory, flags, props, actors, counters, scripts. |
 | `generateWheel` | `(p: CodeWheelParams, seed: string, id?: string): CodeWheel` | public | The wheel of a seed (the `copy-protection` stream of `<seed>\|code-wheel\|<id>`). Throws on parameters `wheelProblems` refuses. |
 | `HintDef` | `interface { id, until, lines }` | public | A hint the hint item gives while its `until` condition is false, as lines said in order. |
 | `HotspotDef` | `interface { defaultVerb, name, kind, visible, exit, onTap }` | public | A named zone of the room the player can act on; its geometry lives in the layout. |
@@ -249,14 +250,14 @@ stabilité. `npx tsx tools/api-doc.ts` (`--check` pour seulement vérifier) la r
 | `IrRealityPolicies` | `type IrRealityPolicies = Omit<RealityDef, 'bridge'>` | public | What the game declares of the world outside, its Bridge's address left out (deployment, not logic). |
 | `IrRoom` | `interface { id, name, hero, look, hints, exits, … 3 more }` | public | A room as logic: its name, looks, hints, exits and the conditions of its walk links; its entities by key. |
 | `IrRule` | `type IrRule = union of 5` | public | A reaction of the game: a written rule, a topic, a listener, a reaction by kind or a verb's fallback lines. |
-| `IrScript` | `interface { id, scope, trigger, while, loop, do, … 1 more }` | public | A sequence of commands that runs without a player's action: a world script, a room's arrival, the intro. |
+| `IrScript` | `interface { id, scope, trigger, while, loop, do, … 3 more }` | public | A sequence of commands that runs without a player's action: a world script, a room's arrival, the intro. |
 | `IrSource` | `interface { file, line }` | public | Where an id is written: a file relative to the working directory, and its line (from 1). |
 | `IrVariantSlot` | `interface { mode, id, manifest, variant }` | public | A world variant of the story (4.1.15 "Remix", ADR 0018): filled when the game was compiled from an instance (`applyVariant`): `id` is the va |
 | `IrWorld` | `interface { schemaVersion, saveVersion, hero, players, hintItem, hintVoice, … 8 more }` | public | The game's world: its hero and players, verbs, start, map, checkpoints, invariants, saves. |
 | `isSeed` | `(input: string): boolean` | public | Whether a string is a well-formed seed (a code with its check symbol, or `story`). |
 | `ItemDef` | `interface { name, icon, look, kind }` | public | An inventory item: its name, its icon, its look lines and its kinds. |
 | `KindRule` | `interface { id, verb, kind, target, item, say }` | public | Reaction by "kind": applies to anything with this `kind` (e.g. `person`, `cat`), before fallback responses. `target` targets a specific id ( |
-| `Layout` | `interface { width, floor, walk, scale, entries, hotspots, … 8 more }` | public | A room's geometry, written by the placement editor: walk areas, entries, and where every hotspot, prop, actor, layer and light stands. |
+| `Layout` | `interface { width, floor, walk, scale, entries, points, … 9 more }` | public | A room's geometry, written by the placement editor: walk areas, entries, and where every hotspot, prop, actor, layer and light stands. |
 | `LightDef` | `interface { id, kind, color, intensity, blend, visible }` | public | A light of the staged room: a radial pool at its layout position, or an ambient colour over the whole room. |
 | `ListLine` | `type ListLine = string \| { id: Id; text: string; }` | public | One line of a list the engine draws from (a look list, a hint, the fallback answers): a plain string, keyed by its position in translations, |
 | `loadVariant` | `(c: CompiledManifest, input: unknown): { variant: WorldVariant; stale: boolean; }` | public | A stored variant (a save's, a session's, a speedrun's) checked and kept as it is: its hash must match its content; it is never regenerated,  |
@@ -288,13 +289,17 @@ stabilité. `npx tsx tools/api-doc.ts` (`--check` pour seulement vérifier) la r
 | `RemixWorld` | `interface { rooms, rules }` | public | What the compiler reads of the game: its rooms' anchors and its rules (a `GameIR` is one). |
 | `RevealDef` | `type RevealDef = EndingDef` | public (dépréciée) | The old name of `EndingDef`. |
 | `RoomDef` | `interface { id, name, decor, description, furniture, music, … 15 more }` | public | A room: its backdrop or stage, props, actors, hotspots, exits, look lines, reactions, topics, hints and scripts. |
+| `RouteDef` | `interface { who, from, steps }` | public | A route's character, the room it starts in and its steps. |
+| `RouteProgress` | `interface { on, wait, blocked, pending }` | public | Where a route stands inside its current step (4.6.0); its step is the script's `pc`/`step`, its character's room and position are `where` an |
+| `RouteScriptDef` | `interface { id, while, loop, manual, route, stepIds, … 1 more }` | public | A route (4.6.0 "Routes", ADR 0031): one character walks from step to step, through rooms, on the world's clock, shown or not. Declared in `G |
+| `RouteStep` | `type RouteStep = union of 3` | public | One step of a route, with its stable `id`. `walk`: to a point of the room's layout. `wait`: so many milliseconds of the world's clock, facin |
 | `Rule` | `interface { id, verb, a, b, if, do, … 1 more }` | public | A written reaction: "when VERB is done on A (with/to B), if CONDITION, then …". `a` and `b` accept a list: the rule works with any of them.  |
 | `ScoreDef` | `interface { stems, bpm, beatsPerBar, loop, states, quantize, … 4 more }` | public | A score in stems: its files, its tempo and loop, and which stems sound in each game state. |
 | `ScoreState` | `interface { if, stems }` | public | Which stems sound in a given state: the first entry whose condition holds wins (`if` absent: always). |
-| `ScriptDef` | `interface { id, while, loop, do, stepIds }` | public | A script of the world: it runs on its own, without a player action, one command at a time, in the gaps between the player's actions (never d |
+| `ScriptDef` | `type ScriptDef = CmdScriptDef \| RouteScriptDef` | public | A script of the world: it runs on its own, without a player action, one command at a time, in the gaps between the player's actions (never d |
 | `SemanticTrigger` | `interface { event, room, item, flag, value, objective, … 3 more }` | public | A semantic trigger: the first event of this kind (and these fields, when given) in the run's journal. A room entered, an item acquired or lo |
 | `Session` | `interface { v, start, base, log, at, seed, … 1 more }` | public | A player's inputs since the game started or a save was loaded, with the state they started from: enough to replay them. |
-| `SessionEntry` | `type SessionEntry = union of 9` | public | One input of a session (`Engine.session`). The answers given while it ran (`picks`, `maps`, `rnd`) are what makes it replayable; `ran` lists |
+| `SessionEntry` | `type SessionEntry = union of 11` | public | One input of a session (`Engine.session`). The answers given while it ran (`picks`, `maps`, `rnd`) are what makes it replayable; `ran` lists |
 | `SignalDef` | `interface { id, source, availability, replay, once, fallback }` | public | A signal the game may receive from the world outside: its id, source, availability, replay mode and fallback. |
 | `SkinDef` | `interface { icons, sounds, fonts, heights, callPoses, pixelArt }` | public | UI skin: everything the engine shows or plays without the content referencing it. Image ids come from the manifest; sounds are ids from `aud |
 | `SpeedrunCategory` | `interface { id, name, timing, start, finish, allowSaves, … 8 more }` | public | A speedrun category: what counts as a run, how it is timed, what it may do. `timing` names the time it is ranked on: `rta` (the wall clock,  |

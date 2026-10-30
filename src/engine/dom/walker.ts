@@ -28,7 +28,7 @@ export class Walker {
   private topology!: WalkTopology;
   private tokens = new Map<Id, number>();
 
-  constructor(private scene: WalkScene) {}
+  constructor(readonly scene: WalkScene) {}
 
   /** A room just built: its floor. */
   enter(layout: Layout, room: RoomDef) {
@@ -42,6 +42,11 @@ export class Walker {
   }
   clamp(p: Point): Point {
     return this.topology.clamp(p);
+  }
+
+  /** Ends the walk of an entity in progress (4.6.0: a route's glide takes it over, dom/world-loop.ts). */
+  stop(id: Id) {
+    this.tokens.set(id, (this.tokens.get(id) ?? 0) + 1);
   }
 
   /** Walks along the path. Returns the arrival point, or null if interrupted by another walk. */

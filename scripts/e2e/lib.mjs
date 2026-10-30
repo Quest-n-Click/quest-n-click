@@ -649,6 +649,13 @@ export async function launch(url, opts = {}) {
         }
       } else if ('step' in en) {
         await waitScript(en.step);
+      } else if ('world' in en) {
+        // Time let pass (4.6.0, a route's next stop): the player waits; the world's clock runs on the page's frames.
+        await page.waitForFunction((t) => (window.__game.engine.state.world ?? 0) >= t, en.world, { timeout: 60000 });
+        await waitIdle();
+      } else if ('routeDo' in en) {
+        await page.waitForFunction(() => !window.__game.engine.world.nextPending(), null, { timeout: 15000 });
+        await waitIdle();
       } else if ('switch' in en) await switchTo(en.switch);
       else if ('script' in en) {
         await page.evaluate((c) => window.__game.engine.script(c), en.script);

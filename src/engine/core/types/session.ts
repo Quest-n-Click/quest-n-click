@@ -59,6 +59,10 @@ export type SessionEntry = (
   | { script: Cmd[] }
   | { enter: Id }
   | { start: 'new' }
+  /** The world's clock run to this tick (4.6.0): time let pass (the solver's "Route" choice, a test's turn). */
+  | { world: number }
+  /** A route's arrival commands (4.6.0, `RouteStep.do`), run once its step is done and the engine idle. */
+  | { routeDo: Id }
   /** A signal from the world outside, verified by the player before it became an input (4.1.1, Reality Bridge). */
   | { external: ExternalEntry }
 ) & {
@@ -77,6 +81,11 @@ export type SessionEntry = (
   ran?: string[];
   /** The state after the entry (`stateDigest`), to spot where a replay diverges. */
   digest?: string;
+  /**
+   * The world's clock at the entry's sync points (4.6.0, core/route-runtime.ts): its beginning, each command, each
+   * answer, its end. A replay runs the world to each before going on. Absent in a game without routes.
+   */
+  wt?: number[];
   /** Milliseconds since the session started (`Engine.clock`; absent in the solver and the tests): playtests read it, replay ignores it. */
   t?: number;
 };

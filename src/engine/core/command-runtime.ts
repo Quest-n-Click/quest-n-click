@@ -57,6 +57,7 @@ export async function step(eng: Engine, c: Cmd, ctx: Ctx): Promise<void> {
   if (o) {
     if (o.src?.skipAt === o.steps) eng.busyState.skipping = true;
     o.steps++;
+    eng.world.sync();
   }
   if (typeof c === 'string') return eng.say(HERO, c, ctx);
   const k = cmdKey(c);

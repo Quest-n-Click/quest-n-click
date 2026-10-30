@@ -269,9 +269,12 @@ export default defineConfig({
             'src/engine/core/diff.ts': { branches: 100 },
             'src/engine/core/migrate.ts': { branches: 100 },
             'src/engine/core/save.ts': { branches: 100 },
-            // 93: v8 counts the presenter's side of `choose` / `pickPlace` as the calls that went to the presenter minus
-            // those fed by a replay, which the rest of the suite outnumbers; both sides are tested (critical-session).
-            'src/engine/core/session-runtime.ts': { branches: 94 },
+            // 98 since 4.6.0 (the routes' sync points are tested both ways). v8 counts the presenter's side of `choose`
+            // / `pickPlace` as the calls that went to the presenter minus those fed by a replay; both sides are tested.
+            'src/engine/core/session-runtime.ts': { branches: 98 },
+            // The world's clock and its routes (4.6.0): two points under what was measured when they arrived.
+            'src/engine/core/route-runtime.ts': { lines: 98, branches: 87 },
+            'src/engine/core/world.ts': { lines: 98, branches: 85 },
             // The one branch left is `?? 0` on a session that always exists by then.
             'src/engine/tools/replay.ts': { branches: 99 },
             // Eleven fallbacks for an old entry that `assignIds` always finds (critical-ids lists them).

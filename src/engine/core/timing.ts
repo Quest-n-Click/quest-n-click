@@ -8,6 +8,11 @@ const SAY_PER_CHAR = 70;
 export const sayMs = (text: string, textSpeed = 1) => Math.max(SAY_MIN, text.length * SAY_PER_CHAR) / textSpeed;
 /** Walking speed, logical units (640 × 400 room) per second. */
 export const WALK_SPEED = 150;
+/**
+ * One tick of the world's clock (4.6.0, core/route-runtime.ts): routes move by whole ticks, so a run is the same at any
+ * frame rate and a replay applies the very ticks a session recorded.
+ */
+export const WORLD_TICK_MS = 50;
 /** Default length of an `anim` command. */
 export const ANIM_MS = 800;
 /** Default length of a camera pan. */

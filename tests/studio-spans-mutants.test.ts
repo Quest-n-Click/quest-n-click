@@ -18,6 +18,14 @@ describe('a game’s own spans', () => {
     expect(() => spanOf('scripts2/a.mjs', own)).toThrow(/belongs to no span/);
   });
 
+  it('a literal key with a character outside the BMP names its file, as one of two UTF-16 units (4.6.0)', () => {
+    // The key's literal split by code point made an emoji one token, compared with a single unit of the path: never equal.
+    const own = parseOwnSpans({ 'notes/😀.md': 'notes', 'docs/😀*': 'meta' });
+    expect(spanOf('notes/😀.md', own)).toBe('notes');
+    expect(spanOf('docs/😀-plan.md', own)).toBe('meta');
+    expect(() => spanOf('notes/😁.md', own)).toThrow(/belongs to no span/);
+  });
+
   it('a folder key the engine names is refused; one it only holds files in is the game’s', () => {
     expect(() => parseOwnSpans({ 'art/': 'meta' })).toThrow(/"art\/" is an engine file/);
     // rooms/ names no file itself (only rooms/<id>.ts is the engine's): a game may give the rest of it a span.

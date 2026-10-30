@@ -151,7 +151,13 @@ export class IrTab {
       ),
       section(
         'Scripts',
-        ir.scripts.map((s) => [s.id, `${s.trigger} · ${s.do.length} commands`, where(ir.provenance[s.id])]),
+        ir.scripts.map((s) => [
+          s.id,
+          s.route
+            ? `route · ${s.route.who} · ${s.route.steps.length} steps`
+            : `${s.trigger} · ${s.do?.length ?? 0} commands`,
+          where(ir.provenance[s.id]),
+        ]),
       ),
       h(
         'details',

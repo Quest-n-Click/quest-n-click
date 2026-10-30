@@ -157,9 +157,9 @@ erreurs avant qu'une personne les voie. Chaque résultat reste relisible, dans l
 ## En chiffres
 
 Mesuré par les vérifications automatiques à la dernière référence, réécrite à chaque release (`npm run quality:baseline`) :
-<!-- metric:tests -->3648<!-- /metric --> déclarations de tests unitaires, sous Node 22 et 24, avec des planchers de
+<!-- metric:tests -->3708<!-- /metric --> déclarations de tests unitaires, sous Node 22 et 24, avec des planchers de
 couverture et des tests de mutation bloquants ; le jeu de référence prouvé en <!-- metric:referenceStates -->288<!-- /metric -->
-états ; la première visite du joueur, <!-- metric:initialJsKB -->136<!-- /metric --> Ko de JavaScript compressé. Chaque
+états ; la première visite du joueur, <!-- metric:initialJsKB -->137<!-- /metric --> Ko de JavaScript compressé. Chaque
 release est construite depuis le commit que son candidat a testé. Le candidat produit les quatre archives de packages,
 l'image du Bridge, les SBOM, les parties enregistrées et la baseline, et la release publie ces fichiers mêmes ; la
 release ne produit que le jeu construit, son manifeste d'assets, les catalogues Remix prouvés, le speedrun de référence

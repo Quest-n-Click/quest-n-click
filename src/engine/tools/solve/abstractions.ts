@@ -105,6 +105,8 @@ export function stateKeys(game: GameDef, commands?: CustomCommands, goal?: Cond[
     exact,
     live,
     realityCursor,
+    // A route's step and how it stands in it (4.6.0) are always state: where its character will be next depends on it.
+    routes: new Set((game.scripts ?? []).filter((s) => s.route).map((s) => s.id)),
   };
 }
 
@@ -149,7 +151,15 @@ export function stateDims(s: GameState, keys: ReturnType<typeof stateKeys>): Dim
   for (const u of s.used ?? []) if (keys.live.items.has(u)) d.push([`used:${u}`, '1']);
   for (const [k, r] of Object.entries(s.where ?? {})) if (keys.live.actors.has(k)) d.push([`where:${k}`, r]);
   for (const [k, st] of Object.entries(s.scripts ?? {}))
-    if (keys.live.actions.has(k)) d.push([`script:${k}`, `${st.pc}${st.done ? 'd' : ''}${st.off ? 'x' : ''}`]);
+    if (keys.routes.has(k)) {
+      // Its step, done, stopped, suspended, begun, held at an exit, its commands pending: never its position inside a
+      // walk or the time left of a wait (the proof is of the stops, not of the timing; ADR 0031).
+      const r = st.route;
+      d.push([
+        `script:${k}`,
+        `${st.pc}${st.done ? 'd' : ''}${st.off ? 'x' : ''}${st.paused ? 'p' : ''}${r?.on ? 'o' : ''}${r?.blocked ? 'b' : ''}${r?.pending ? 'q' : ''}`,
+      ]);
+    } else if (keys.live.actions.has(k)) d.push([`script:${k}`, `${st.pc}${st.done ? 'd' : ''}${st.off ? 'x' : ''}`]);
   if (s.active) d.push(['active', s.active]);
   for (const [k, p] of Object.entries(s.players ?? {}))
     d.push([

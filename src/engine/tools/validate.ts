@@ -20,6 +20,7 @@ import { normalizeExits } from '../core/define';
 import { worldGraph } from './graph';
 import { transitionPeak } from './weight';
 import { puzzleGraph, puzzleIssues } from './puzzle';
+import { routeChecks } from './validate/routes';
 import type {
   Cmd,
   Cond,
@@ -62,6 +63,7 @@ export interface Report {
 }
 
 const HERO = 'hero';
+const SCRIPT_CONTROL = ['startScript', 'stopScript', 'suspendScript', 'resumeScript'] as const;
 
 export function validate(gameIn: GameDef, layouts: Record<string, Layout>, opts: ValidateOptions = {}): Report {
   // Declared exits are checked as what they become (hotspots and rules), on a copy: the caller's game stays as written.
@@ -443,12 +445,9 @@ export function validate(gameIn: GameDef, layouts: Record<string, Layout>, opts:
       if (!inScript) warn(where, 'waitEvent outside the top level of a script does nothing');
       return;
     }
-    if ('startScript' in c) {
-      scriptRefs.push([c.startScript, where]);
-      return;
-    }
-    if ('stopScript' in c) {
-      scriptRefs.push([c.stopScript, where]);
+    const sref = SCRIPT_CONTROL.find((k) => k in c);
+    if (sref) {
+      scriptRefs.push([(c as Record<string, string>)[sref]!, where]);
       return;
     }
     if ('custom' in c) {
@@ -562,6 +561,7 @@ export function validate(gameIn: GameDef, layouts: Record<string, Layout>, opts:
     list?.forEach((sc, i) => {
       const w = `${where}[${i}]`;
       if (!sc.id) err(w, 'script without id');
+      if (sc.route) return; // a route (4.6.0): validate/routes.ts
       if (game.schemaVersion === 3) {
         if (sc.stepIds?.length !== sc.do.length)
           err(w, `schema v3 script needs one stable step id per command (${sc.do.length} expected)`);
@@ -835,6 +835,7 @@ export function validate(gameIn: GameDef, layouts: Record<string, Layout>, opts:
   });
   (game.rules.on ?? []).forEach((r, i) => rule(r, `rules.on[${i}]`));
   scripts(game.scripts, 'scripts');
+  routeChecks(game, layouts, { rooms, err, warn, cond, cmds, stable });
   events(game.events, 'events');
 
   // Map

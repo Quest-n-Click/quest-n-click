@@ -12,6 +12,7 @@ import { patchGame, readPatches, storageKey, type KeyValue } from '../src/studio
 import { applyPatches, parsePatchFile } from '../studio-server/src/ops/apply';
 import { createStudio, importInChild } from '../studio-server/src/ops/core';
 import { buildSnapshot } from '../tools/studio/snapshot';
+import { roundLayout } from '@engine/dev/save-layout';
 import type { StudioSnapshot } from '../tools/studio/types';
 
 const ROOT = resolve(__dirname, '..');
@@ -133,6 +134,13 @@ describe('browser backend', () => {
     expect(readPatches(storage, api.gameId).filter((p) => p.kind === 'text')).toHaveLength(5);
     const again = new BrowserApi({ snapshot, storage });
     expect(await again.room('house')).toEqual(room);
+  });
+
+  it('keeps the route points placed in the editor (4.6.0), rounded like any coordinate', async () => {
+    const { api } = fresh();
+    const L = structuredClone(snapshot.rooms.house.layout);
+    await api.setLayout('house', roundLayout({ ...L, points: { stove: [101.4, 302.6] } }));
+    expect((await api.room('house')).layout.points).toEqual({ stove: [101, 303] });
   });
 
   it('keeps layouts, storyboard and notes, compacts what is overridden, and resets', async () => {

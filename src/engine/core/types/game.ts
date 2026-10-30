@@ -19,6 +19,7 @@ import type {
   ListLine,
   PropDef,
   Rule,
+  CmdScriptDef,
   ScriptDef,
   TalkTopic,
   Value,
@@ -61,7 +62,7 @@ export interface RoomDef {
   hints?: HintDef[];
   onEnter?: Cmd[];
   /** Scripts that run on their own while the player is in the room (see ScriptDef). */
-  scripts?: ScriptDef[];
+  scripts?: CmdScriptDef[];
   /** Listeners of the room's events, then of the game's (see EventRule). */
   events?: EventRule[];
   /** Is the hero present? (no for a pure cutscene) */

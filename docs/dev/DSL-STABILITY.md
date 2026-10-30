@@ -82,6 +82,22 @@ none of them keeps its logic fingerprint, its saves and its replays.
 - **Voice keys by value**: a line with switches looks up `<id>~<flag>=<value>` (flags sorted, joined by `~`) before its
   plain id, in `audio.voices` and `audio.voicesByLang` (`wiki/en/create.voices.md`).
 
+## Admitted on main: 4.6.0 "Routes" (ADR 0031, D58)
+
+A character walks an itinerary through rooms on the world's clock (`docs/dev/PLAN-4.6-ROUTES.md`; its §2 is the
+admission file: `moveActor` in a looping script, a room script's `walk`, and `wait` then `waitUntil` give no progress
+off screen, no saved position or wait, and no hold while the player speaks to the character). Additive and optional:
+a game that declares no route has no world, and keeps its logic fingerprint, its saves and its replays.
+
+- **`RouteScriptDef`** in `GameDef.scripts` (`route: { who, from, steps }`, `manual`, `while`, `loop`), with
+  **`RouteStep`** (`walk` a layout point, `wait` milliseconds with `face`/`pose`, `exit` through an exit, each with
+  `do`). `ScriptDef` becomes `CmdScriptDef | RouteScriptDef`; a room's scripts stay `CmdScriptDef`.
+- **`Layout.points`**: the named points routes walk to, placed in the editor (presentation geometry).
+- **Commands `suspendScript` and `resumeScript`**, valid for any script.
+- **State**: `GameState.world` (the clock, in ticks), `scripts[id].paused` and `scripts[id].route` (`RouteProgress`);
+  **sessions**: `SessionEntry.wt`, the entries `{ world }` and `{ routeDo }`. The envelope stays v4, `schemaVersion` 3,
+  and the IR schema 1 (`IrScript.do` optional, `route` and `manual` added).
+
 ## The candidate primitives (programme §8.3)
 
 A primitive enters only when a game or a fixture shows that a reasonable combination of the existing ones cannot
@@ -93,7 +109,8 @@ express it (programme §3, D22). The candidates, each with its verdict and its p
 | Narration | quest journal | **admitted** with objectives | the pause menu's list reads `objectives`; no second primitive. |
 | Narration | named dialogue states | refused, the existing ones suffice | a topic's `if` over a flag, an `nth` block inside it, and `{ seen: 'topic.<id>' }` (`games/demo/rooms/garden.ts`: Grandpa's two topics about the key, switched by `tank_drained`; `wiki/en/create.classics.md`, the insult fight). |
 | Narration | parallel sequences | refused, the existing ones suffice | `{ parallel: [[…], […]] }` and world scripts (`scripts`, `tests/fixtures/world.ts`). |
-| Narration | rendezvous in time | refused without proof (sheet) | no game asks for it; a script's `{ wait }` then `waitUntil` covers a timed scene. |
+| Narration | rendezvous in time | refused without proof (sheet) | no game asks for it; a script's `{ wait }` then `waitUntil` covers a timed scene. 4.6.0's routes do not change it: the solver proves where a route stops, never when (ADR 0031). |
+| Narration | a character's itinerary through rooms | **admitted** (ADR 0031, D58) | `moveActor` teleports, a room script's `walk` stops off screen and saves no position (PLAN-4.6-ROUTES §2); `games/routes` and `tests/fixtures/routes.ts` walk two characters at once. |
 | Narration | real-world events | refused, the existing ones suffice | a Reality signal is an event (`reality.signals`, `events: [{ on }]`, `games/signals`). |
 | Reality | wait for a signal | refused, the existing ones suffice | a listener on the signal (`games/signals/rooms/start.ts`, `start.mail-correct`) or `{ waitEvent: '<signal>' }` in a script (`tests/core.test.ts`). |
 | Reality | delay and expiry | refused, the existing ones suffice | a script `[{ wait: ms }, { if: '!answered', then: [{ emit: 'timeout' }] }]` beside the listener; no Gateways scenario needed one (its signals are optional or have a `fallback`). |

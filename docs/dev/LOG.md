@@ -9695,9 +9695,14 @@ whether the order and the cache hold.
 first release with a warm cache; #406's quarantine lifted once `studio-hosted (firefox)`'s warnings stay silent; the
 22 field passes, still open.
 
-## #383 · 2026-11-08 · Claude · release · 4.7.2 "Audit fixes": TODO(release)
+## #383 · 2026-11-08 · Claude · release · 4.7.2 "Audit fixes": what an audit of 4.7.1 found, fixed by area
 
-- **The request**: TODO(release)
+- **The request**: on 8 November, after #454 (the first report from a user outside the project: `npm run studio`
+  stopped in a game project), wanoo asked for an audit of 4.7.1, then a plan for every finding, one pull request per
+  area, and then "merge tout et lance la release 4.7.2". The audit found 18 defects, four of them an intrusion or a
+  data loss (the local Studio, the Studio Server, the Bridge); each fix came with a test that fails before it. Two more
+  were found by #460's own CI: the engine's package missed `bridge/src/config.ts` once the SQL store threw a
+  `BridgeError`, and the Mystery commits' limiter used a tenant id of its own (`a|commits`) that a restore refused.
 - **What ships**: the pull requests merged since v4.7.1, oldest first: #455 (The Studio starts from the installed
   engine: AGENTS.md shipped, every shipped import checked (#454)), #456 (The local Studio's guard covers every letter
   case, and serves this machine only outside LAN mode), #458 (Studio Server hardening: logout body limit, agent writes
@@ -9719,4 +9724,7 @@ first release with a warm cache; #406's quarantine lifted once `studio-hosted (f
 - **Signature**: the tag is signed with an SSH key `.github/allowed_signers` names (`npm run release -- 4.7.2` refuses
   any other).
 
-→ next: TODO(release)
+→ next: the 22 field passes, triaged (close five, automate `firefox-real-offline` and `run-resume-power-cycle`, one
+hosted-Studio session for #149, #150, #166, #167, #196); the Dependabot alerts on minimatch and deepmerge, whose
+override breaks the PWA precache; `keyOf` in the Open Badges verifier, which reads `controller` unchecked; the
+`studio-assets` test that fails on a clean main.

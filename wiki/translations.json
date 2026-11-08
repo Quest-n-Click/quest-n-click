@@ -12846,10 +12846,10 @@
       ]
     },
     "install.upgrade-notes-4-7#_lead": {
-      "enHash": "751bbbef6b0c86f0b622bd458427112dd24b2dcf698b40ee65243dd08648caf3",
-      "frHash": "73bdd54bd23ada9adeb16ca382502ae1473ef768461991dd2c3b03ee0427f423",
+      "enHash": "e130d927583837f14876d8ddbe5a074589050748527b190bc95bee41060b8a34",
+      "frHash": "fd2a87fe568ecae7ed79cb9d408abc0262a1a0a68427ce6a7ae8c2d9eb7f219f",
       "reviewers": [
-        { "name": "claude-opus-5-5", "kind": "ai", "relation": "author", "date": "2026-11-06" }
+        { "name": "claude-opus-5.5", "kind": "ai", "relation": "author", "date": "2026-11-08" }
       ]
     },
     "install.upgrade-notes-4-7#from-4-6-0-to-4-7-0": {
@@ -12864,6 +12864,13 @@
       "frHash": "c5d449669d07b2887303952d7ea3fb0ea41d8e1a107e10f0b4ca5fd2dcfa6b94",
       "reviewers": [
         { "name": "claude-opus-5-5", "kind": "ai", "relation": "author", "date": "2026-11-06" }
+      ]
+    },
+    "install.upgrade-notes-4-7#from-4-7-1-to-4-7-2": {
+      "enHash": "c59dbc91fe3890e1935d96af27587d53a527076facfded73d761e8ee8a03412f",
+      "frHash": "43a7e3cafce4c4fd5cce2fe46871333582f24747ae5988f0e0a763d2a5bdbc82",
+      "reviewers": [
+        { "name": "claude-opus-5.5", "kind": "ai", "relation": "author", "date": "2026-11-08" }
       ]
     },
     "install.upgrade-notes-v2-to-v3#_lead": {

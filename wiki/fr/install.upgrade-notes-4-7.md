@@ -1,8 +1,6 @@
 # Notes de mise à jour : 4.7
 
-TODO(release) : nommer la 4.7.2 dans cette introduction.
-
-Ce que la 4.7.0, puis la 4.7.1, ont changé. Rien à modifier dans un jeu : il se construit, se joue et se sauvegarde comme en 4.6.0.
+Ce que la 4.7.0, puis la 4.7.1 et la 4.7.2, ont changé. Rien à modifier dans un jeu : il se construit, se joue et se sauvegarde comme en 4.6.0.
 Chaque ajout est facultatif ; tous sauf `keepPlaying` de la fin sont visuels, invisibles aux règles, sauvegardes et
 solveur.
 
@@ -79,66 +77,43 @@ en quarantaine : elle avertit au lieu d'échouer tant que #406 n'est pas fermée
 
 ## De la 4.7.1 à la 4.7.2 « Audit fixes »
 
-TODO(release) : ce qui change dans un jeu (« Rien à changer dans un jeu : il se construit, se joue et se sauvegarde comme en 4.7.1 » quand rien ne change), puis pour un hébergeur ou un mainteneur. Les entrées du CHANGELOG de la release, à réécrire pour qui met à jour :
+Rien à changer dans un jeu : il se construit, se joue et se sauvegarde comme en 4.7.1. La 4.7.2 corrige ce qu'un audit
+de la 4.7.1 a trouvé dans le paquet, le Studio, le Studio Server, les connecteurs et le Bridge ; trois des correctifs
+changent ce que voit un hébergeur.
 
-- **Open Badges: only a hashed-email recipient makes a badge `valid`** (4.7.2). A badge whose recipient can be read in
-  the badge itself (a clear email, a URL, a DID, an Open Badges 3.0 `credentialSubject.id`) now gives `indeterminate`,
-  and the form no longer reads a `recipient` field: the player gives the email the badge was issued to. A game whose
-  issuer puts clear recipients in its badges sees `indeterminate` where it saw `valid`; ask the issuer for hashed ones.
-- **`npm run studio` starts from the installed engine (4.7.2, #454)**: the Studio's assistant imports `AGENTS.md` as its
-  system prompt, and the engine's package did not carry it, so Vite stopped on "Failed to resolve import
-  ../../AGENTS.md?raw" in a game project. The package now ships it, and a test reads every relative import of every
-  file the package ships and fails when its target is not shipped too.
-- **The local Studio's guard covers its routes in any letter case (4.7.2)**: Vite's router mounts the Studio's API
-  without regard to case, while the guard (Host, Origin, the LAN token) only looked at `/__studio` in lower case. The
-  guard now covers every spelling, and a test drives the real dev server to prove it.
-- **Outside LAN mode the local Studio answers this machine only (4.7.2)**: `npm run studio -- --host` (or
-  `dev -- --host`) listens on the network without a token, and Host and Origin are headers a peer outside a browser sets
-  as it likes. The Studio's routes now refuse any address but loopback (403) unless `npm run studio:lan` started them,
-  with its token. A Studio reached through a container's port mapping is refused too: run `studio:lan` there.
-- **Email over IMAP: retention touches only the messages the connector handled** (4.7.2). The connector marks each
-  message it handles with the keyword `$QuestNClick`; the `keepDays` sweep and the deletion after acceptance remove
-  only those, by their UIDs (`UID EXPUNGE`), never the operator's other mail in the folder nor what another client
-  marked deleted. A server without UIDPLUS keeps them marked `\Deleted`, and the log says so once
-  (`email.expunge-unsupported`). A dedicated folder (`imap.mailbox`) is still the recommended setup.
-- **Open Badges: a valid badge counts for one player** (4.7.2). The first player who redeems a badge keeps it; another
-  player posting the same badge gets 409 `{"status":"valid","signal":"claimed"}`. The connector remembers this in
-  memory, so a restart forgets it.
-- **The back-channel logout reads no more of a body than it takes (4.7.2)**: a form over its 16 KiB limit, or announced
-  as such by its length, is answered 413 and the rest of it drained, not kept in memory, as the API's JSON bodies
-  already were. Its limit is counted in bytes.
-- **An agent's whole-file write no longer overwrites a teammate's edit (4.7.2)**: `set_storyboard` and `set_layout`,
-  over the remote MCP or the local MCP pointed at a hosted Studio, send the revision the agent read the file at. A file
-  someone else wrote since is refused (409), and the agent reads it again, instead of the teammate's change being
-  silently replaced.
-- **A session checked by two requests or two instances at once is refreshed once (4.7.2)**: the check is claimed in the
-  database, so a provider that rotates refresh tokens and detects their reuse no longer ends a member's session during
-  a deploy's overlap or a burst of requests. A refusal of a token another instance has rotated since ends nothing.
-- **`gc --delete` keeps a blob stored again while it runs (4.7.2)**: each blob's date is read again right before its
-  deletion, and one written within the grace period since the listing stays.
-- **A git push or import reads the game's blobs several at a time (4.7.2)**: one request per file instead of two, eight
-  at a time, as a build stores its files.
-- **A tenant's run retention deletes its own runs only** (4.7.2): on a Bridge serving several tenants, each tenant's
-  hourly purge kept another tenant's runs younger than that tenant's own `retentionDays`; a short retention on one
-  tenant no longer empties the others' leaderboards.
-- **An acknowledgement never brings a revoked or forgotten player back** (4.7.2): `POST /v1/ack` now renews only the
-  link's expiry of a player still held and not revoked, and the operator's revoke and the player's unlink change only
-  the `revoked` mark, so a revoke or a deletion landing at the same moment on another instance stays done.
-- **A signal is never written for a player revoked or deleted meanwhile** (4.7.2): the store reads the player again
-  inside the transaction that writes the signal; a proposal racing a revoke or a deletion on another instance is
-  refused with 404 and leaves no row.
-- **An event stream whose client leaves while it opens is let go** (4.7.2): such a stream no longer stays counted
-  against the player's `streamsPerPlayer`, so repeated drops during the setup no longer end in a 429 for that player.
-- **The Mystery commit quota holds across instances** (4.7.2): on a SQL store, `commitsPerHour` is counted in the
-  database for every instance of the tenant, as the runs' quota is, instead of once per process (a bucket of three
-  refilled over the hour; the memory store keeps its rolling hour).
-- **The per-address rate limits key IPv6 by its /64** (4.7.2): an IPv6 client counts as one address for its whole /64,
-  and the tables of addresses are swept at most every 10 seconds instead of on each new address once they are large.
-- **The engine's package no longer carries the maintainers' benches (4.7.2, #454)**: `tools/audit-corpus.ts`,
-  `bridge-cluster.ts`, `bridge-load.ts`, `golden-save.ts`, `prove-matrix.ts`, `runs-load.ts` and the release commands
-  (`tools/release/prepare.ts`, `release-run.ts`) read the repository's `tests/`, `scripts/`, `games/demo` or the
-  Bridge's CLI, which a game project does not have: shipped, they could not run. The same test found them.
-- **A per-address limit on pairing codes** (4.7.2): `limits.pairingsPerAddress` (default 5) is how many codes one
-  address may ask per 10 minutes, per tenant; beyond, `POST /v1/pairings` answers 429 with `Retry-After` for that
-  address only, so a few addresses can no longer fill `pendingPairings` for every player. A host pairing many players
-  from one address (a test, a kiosk) raises it in its `config.json`.
+**Dans un projet de jeu**, `npm run studio` redémarre depuis le moteur installé (#454) : le paquet livre désormais
+`AGENTS.md`, qu'importe l'assistant du Studio, et ne livre plus les bancs et les commandes de release des mainteneurs,
+qui ne pouvaient pas tourner hors du dépôt.
+
+**Pour le Studio local**, sa garde couvre ses routes quelle que soit la casse, et hors du mode LAN il ne répond qu'à
+cette machine : `npm run studio -- --host` (ou `dev -- --host`) reçoit désormais 403 depuis une autre adresse, y
+compris à travers la redirection de port d'un conteneur. Pour un téléphone ou un conteneur, lancez `npm run studio:lan`
+avec son jeton.
+
+**Pour un Studio Server**, rien à configurer. Un `set_storyboard` ou un `set_layout` d'un agent est refusé (409) quand
+un coéquipier a écrit le fichier depuis que l'agent l'a lu ; l'agent le relit. Une session vérifiée par deux instances à
+la fois n'est rafraîchie qu'une fois : un fournisseur qui détecte la réutilisation d'un refresh token ne met plus fin aux
+sessions pendant un déploiement. La déconnexion back-channel répond 413 à un corps de plus de 16 Kio sans le garder,
+`gc --delete` garde un blob stocké de nouveau pendant qu'il tourne, et un push ou un import git lit les blobs huit par
+huit.
+
+**Pour l'hébergeur d'un connecteur**, deux changements de comportement :
+
+- **Open Badges** : seul un destinataire haché avec l'e-mail du joueur rend un badge `valid`. Un badge dont le
+  destinataire se lit dans le badge (un e-mail en clair, une URL, un DID, un `credentialSubject.id` Open Badges 3.0)
+  donne désormais `indeterminate` ; demandez des destinataires hachés à l'émetteur. Un badge valide compte pour le
+  premier joueur qui l'utilise ; un autre reçoit 409 `{"status":"valid","signal":"claimed"}`. Cet enregistrement est
+  gardé en mémoire et un redémarrage l'oublie.
+- **E-mail par IMAP** : le connecteur marque chaque message qu'il traite du mot-clé `$QuestNClick`, et la rétention
+  comme la suppression après acceptation n'enlèvent que ceux-là, par UID. Un serveur sans UIDPLUS les garde marqués
+  `\Deleted` (journalisé une fois, `email.expunge-unsupported`). Un dossier dédié (`imap.mailbox`) reste la
+  configuration recommandée.
+
+**Pour l'hébergeur d'un Bridge**, une nouvelle limite : `limits.pairingsPerAddress` (5 par défaut) est le nombre de
+codes d'appairage qu'une adresse peut demander par 10 minutes, par tenant ; au-delà, `POST /v1/pairings` répond 429. Un
+hébergeur qui appaire beaucoup de joueurs depuis une adresse (un banc de test, une borne) l'augmente dans `config.json`.
+Les clients IPv6 comptent pour une adresse par /64, donc leurs compteurs de quota repartent une fois de zéro. Le reste
+ne demande rien : la rétention des runs d'un tenant ne supprime que les siennes, un acquittement ne fait jamais revenir
+un joueur révoqué ou supprimé, un signal n'est jamais écrit pour un joueur révoqué entre-temps, un flux d'événements
+abandonné pendant son ouverture ne compte plus dans `streamsPerPlayer`, et sur un store SQL le quota des engagements
+Mystery (`commitsPerHour`) tient sur toutes les instances.

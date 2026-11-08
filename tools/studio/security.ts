@@ -33,7 +33,7 @@ export function allowedStudioHosts(env: Record<string, string | undefined> = pro
 }
 
 /**
- * A path the guard covers (next): connect, Vite's router, mounts `/__studio/api` without regard to case, so
+ * A path the guard covers (4.7.2): connect, Vite's router, mounts `/__studio/api` without regard to case, so
  * `/__STUDIO/api/…` reaches the same handlers and must meet the same guard.
  */
 export const isStudioPath = (path: string) => {
@@ -47,7 +47,7 @@ const loopback = (address: string | undefined) =>
 
 /** Same-origin + optional LAN token guard shared by every file-writing development route. */
 export function authorizeStudioRequest(req: IncomingMessage, res: ServerResponse): boolean {
-  // Outside LAN mode only this machine is served (next): `--host` listens on the network, and Host and Origin are
+  // Outside LAN mode only this machine is served (4.7.2): `--host` listens on the network, and Host and Origin are
   // headers any peer outside a browser sets as it likes.
   if (process.env.WEB_SCUMM_LAN !== '1' && !loopback(req.socket.remoteAddress)) {
     res.statusCode = 403;

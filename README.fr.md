@@ -31,7 +31,7 @@ ou Linux. Le moteur s'installe depuis l'archive d'une release, ou depuis npm à 
 est une fois approuvée par un propriétaire) :
 
 ```bash
-T=https://github.com/Quest-n-Click/quest-n-click/releases/download/v4.7.1/quest-n-click-4.7.1.tgz
+T=https://github.com/Quest-n-Click/quest-n-click/releases/download/v4.7.2/quest-n-click-4.7.2.tgz
 npx --package=$T quest-n-click create mon-jeu "Mon jeu" --engine=$T
 cd mon-jeu && npm install
 npm run assets && npm run dev        # y jouer ; puis npm run verify, npm run build
@@ -90,7 +90,7 @@ Chaque partie n'est promise que jusqu'où elle est testée ([Stabilité et suppo
 
 « Limité » veut dire que des machines le testent mais qu'aucune personne ne l'a encore confirmé sur de vrais appareils
 ([Passes de terrain](https://github.com/Quest-n-Click/quest-n-click/wiki/FR-Contribuer-Passes-De-Terrain)). Seule la dernière version mineure reçoit des correctifs.
-Aujourd'hui : <!-- metric:tests -->3920<!-- /metric --> déclarations de tests unitaires, le jeu de référence prouvé
+Aujourd'hui : <!-- metric:tests -->3936<!-- /metric --> déclarations de tests unitaires, le jeu de référence prouvé
 en <!-- metric:referenceStates -->288<!-- /metric --> états, une première visite de
 <!-- metric:initialJsKB -->140<!-- /metric --> Ko de JavaScript compressé.
 
@@ -111,7 +111,7 @@ Toute la documentation est [le wiki](https://github.com/Quest-n-Click/quest-n-cl
 
 ## Releases
 
-Release actuelle : [v4.7.1 (Shorter Road)](https://github.com/Quest-n-Click/quest-n-click/releases/tag/v4.7.1) : La prose d'une release est en grande partie écrite par `npm run release -- prepare` : les faits de l'entrée du LOG, la feuille des passes, l'introduction du CHANGELOG et la ligne du README tirées des lignes `### Release` qu'une pull request laisse dans son fragment, pour les mainteneurs. Une branche nomme `next` la release où elle arrivera et la release en écrit le numéro, et `release -- check` lance les tests que la version fait bouger avant la pull request de release, pour les mainteneurs et les contributeurs.
+Release actuelle : [v4.7.2 (Audit fixes)](https://github.com/Quest-n-Click/quest-n-click/releases/tag/v4.7.2) : Un correctif pour les auteurs de jeux : le Studio redémarre depuis le moteur installé, et le paquet du moteur ne contient plus que des fichiers qui fonctionnent dans un projet de jeu.
 Toutes les releases précédentes sont dans le [CHANGELOG](CHANGELOG.md).
 
 ## Licences

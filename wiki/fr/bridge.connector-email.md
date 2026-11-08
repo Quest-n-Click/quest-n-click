@@ -157,7 +157,7 @@ dépôt du moteur, `npx quest-n-click-connector email …` avec le paquet `quest
   Avec `keepDays: 0` (par défaut), un message est supprimé dès que son signal est accepté (ou trouvé déjà accepté) ;
   avec `keepDays: N`, au bout de N jours. La rétention et la suppression ne touchent que les messages qui portent ce
   mot-clé : le reste du courrier de l’opérateur dans le dossier, et ce qu’un autre client a marqué supprimé, ne sont
-  pas touchés (next). Supprimer demande un serveur avec UIDPLUS (`UID EXPUNGE`) ; sans lui, les messages sont
+  pas touchés (4.7.2). Supprimer demande un serveur avec UIDPLUS (`UID EXPUNGE`) ; sans lui, les messages sont
   seulement marqués `\Deleted`, et le journal le dit une fois (`email.expunge-unsupported`). Un message refusé pour de
   bon est signalé (`\Flagged`) et gardé pour l’opérateur. Un message refusé pour une raison passagère (le Bridge absent ou
   occupé, un quota) reste non lu et est relu au relevé suivant.

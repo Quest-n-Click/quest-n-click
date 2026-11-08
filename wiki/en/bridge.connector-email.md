@@ -154,7 +154,7 @@ repository, `npx quest-n-click-connector email …` with the package `quest-n-cl
 - IMAP mode: flags in the mailbox. Every message the connector handles gets the keyword `$QuestNClick`. With
   `keepDays: 0` (the default) a message is deleted as soon as its signal is accepted (or found accepted already); with
   `keepDays: N`, after N days. Retention and deletion only touch messages carrying the keyword: the operator's other
-  mail in the folder, and what another client marked deleted, are left alone (next). Deletion needs a server with
+  mail in the folder, and what another client marked deleted, are left alone (4.7.2). Deletion needs a server with
   UIDPLUS (`UID EXPUNGE`); without it the messages are only marked `\Deleted`, and the log says
   `email.expunge-unsupported` once. A message refused for good is flagged (`\Flagged`) and kept for the operator. A message refused for a reason that may pass (the Bridge away or busy, a
   quota) stays unseen and is read again at the next poll.

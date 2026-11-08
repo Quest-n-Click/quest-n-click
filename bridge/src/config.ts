@@ -52,7 +52,7 @@ export interface Limits {
   streamBufferBytes: number;
   /** Pairing codes waiting for a confirmation, all players together: beyond, a 429 (anyone may ask). */
   pendingPairings: number;
-  /** Pairing codes one address (an IPv6 /64) may ask per 10 minutes (next): beyond, a 429 for that address only. */
+  /** Pairing codes one address (an IPv6 /64) may ask per 10 minutes (4.7.2): beyond, a 429 for that address only. */
   pairingsPerAddress: number;
   /** The longest a capability lives, renewals included: then the player pairs again. */
   capabilityMaxMs: number;

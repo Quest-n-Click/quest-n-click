@@ -87,7 +87,7 @@ the package.
    ```
 
    `badge` is a URL, a compact JWS, or the credential itself; `email` is what the badge's hashed recipient is checked
-   against. Only a badge whose recipient is a hashed email can be `valid` (next): a recipient readable in the badge (a
+   against. Only a badge whose recipient is a hashed email can be `valid` (4.7.2): a recipient readable in the badge (a
    clear email, a URL, a DID, an OB3 `credentialSubject.id`) can be copied by anyone who sees the badge, so it gives
    `indeterminate`; a `recipient` field is no longer read. The answer is `202 {"status":"valid","signal":"accepted"}`, or `200 {"status":"…","signal":"none"}`
    when the game declares no signal for that verdict.
@@ -109,7 +109,7 @@ the package.
 | 422 `{"error":"pairing-pairing"}` | The code is unknown, expired or used already: a code serves once | A new code from the game |
 | 400 `{"error":"shape"}` | Not JSON, or no `code` | Post `{ code, badge, email? }` |
 | 202 with `"status":"indeterminate"` | A proof suite it cannot check (`eddsa-rdfc-2022`…), a document it could not fetch under its policy, or a recipient that is not a hashed email | Ask the issuer for a supported format or a hashed recipient; check `hosts` |
-| 409 `{"status":"valid","signal":"claimed"}` | Another player already redeemed this badge (next) | — |
+| 409 `{"status":"valid","signal":"claimed"}` | Another player already redeemed this badge (4.7.2) | — |
 | 202 with `"status":"invalid"` | Another issuer than the game's, a recipient that does not match, a bad or weak signature | — |
 | 413, or 429 `{"error":"rate"}` | A body over 64 KB; over 30 posts a minute from one address | — |
 
@@ -143,7 +143,7 @@ Stop the process (SIGTERM). Revoke its token on the Bridge if it leaked, and gra
   than P-256 for ES256, anything but Ed25519 for `eddsa-jcs-2022`).
 - The key is `sha256('open-badge:' + badge id + ':' + verdict)`: the same badge with the same verdict for the same
   player is one signal. A valid badge counts for one player: the first who redeems it keeps it, another gets 409
-  `claimed` (next). The connector remembers this in memory: a restart forgets it.
+  `claimed` (4.7.2). The connector remembers this in memory: a restart forgets it.
 
 <a name="network-policy"></a>
 

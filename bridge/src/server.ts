@@ -62,7 +62,7 @@ export { inAllowlist };
 const LOOPBACK = ['127.0.0.1', '::1'];
 
 /**
- * The key an address is limited under (next): an IPv4 address as it is, an IPv6 one by its /64 (one host is usually
+ * The key an address is limited under (4.7.2): an IPv4 address as it is, an IPv6 one by its /64 (one host is usually
  * handed a whole /64), an IPv4-mapped IPv6 address as its IPv4.
  */
 export function addressKey(ip: string): string {
@@ -82,7 +82,7 @@ export function addressKey(ip: string): string {
 
 /**
  * Token buckets per address (4.1.2): one for the routes anyone may call, one for failed authentications, one for the
- * pairing codes (next). `perWindow` tokens, refilled over `windowMs`.
+ * pairing codes (4.7.2). `perWindow` tokens, refilled over `windowMs`.
  */
 class Buckets {
   private b = new Map<string, { tokens: number; at: number }>();
@@ -275,7 +275,7 @@ export function bridgeServer(bridges: Bridge | Bridge[], o: ServeOptions = {}): 
       if (req.method === 'GET' && path === '/v1/manifest')
         return send(200, { manifest: bridge.config.manifest, hash: bridge.config.manifestHash });
       if (req.method === 'POST' && path === '/v1/pairings') {
-        // The codes waiting are bounded for every player together: one address takes only a few of them (next).
+        // The codes waiting are bounded for every player together: one address takes only a few of them (4.7.2).
         if (!pairings.get(bridge)?.take(ip)) {
           res.setHeader('Retry-After', String(Math.ceil(600 / Math.max(1, bridge.limits.pairingsPerAddress))));
           throw new BridgeError(429, 'rate', 'too many pairing codes from this address: try again in a few minutes');

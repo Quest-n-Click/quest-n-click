@@ -116,7 +116,7 @@ documentation par le MCP stdio local de la même version du moteur, sans `--serv
   nomme.
 - **Un fichier entier, d'après ce qu'il a lu.** `set_storyboard` et `set_layout` envoient en `x-studio-base` la
   révision à laquelle l'agent a lu (ou écrit) ce fichier pour la dernière fois : un fichier écrit depuis par quelqu'un
-  d'autre est refusé (409), et l'agent le relit (next). Ses autres écritures n'envoient pas de base : calculées par le
+  d'autre est refusé (409), et l'agent le relit (4.7.2). Ses autres écritures n'envoient pas de base : calculées par le
   serveur sur le fichier tel qu'il est maintenant et vérifiées par la garde de validation. Sur `/mcp`, les révisions
   sont gardées par jeton par l'instance qui a servi la lecture : un nouveau jeton, ou une autre instance, écrit sans
   base.

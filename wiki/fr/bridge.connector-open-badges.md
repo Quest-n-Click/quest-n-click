@@ -88,7 +88,7 @@ configuration et son jeton. `npm run connector -- open-badge …` dans le dépô
    ```
 
    `badge` est une URL, un JWS compact, ou le justificatif lui-même ; `email` est ce à quoi on compare le
-   destinataire haché du badge. Seul un badge dont le destinataire est un e-mail haché peut être `valid` (next) : un
+   destinataire haché du badge. Seul un badge dont le destinataire est un e-mail haché peut être `valid` (4.7.2) : un
    destinataire lisible dans le badge (un e-mail en clair, une URL, un DID, un `credentialSubject.id` OB3) peut être
    recopié par quiconque voit le badge, il donne donc `indeterminate` ; un champ `recipient` n’est plus lu. La réponse est `202 {"status":"valid","signal":"accepted"}`, ou
    `200 {"status":"…","signal":"none"}` quand le jeu ne déclare aucun signal pour ce verdict.
@@ -110,7 +110,7 @@ configuration et son jeton. `npm run connector -- open-badge …` dans le dépô
 | 422 `{"error":"pairing-pairing"}` | Le code est inconnu, expiré ou déjà utilisé : un code ne sert qu’une fois | Un nouveau code depuis le jeu |
 | 400 `{"error":"shape"}` | Pas du JSON, ou pas de `code` | Poster `{ code, badge, email? }` |
 | 202 avec `"status":"indeterminate"` | Une suite de preuve qu’il ne sait pas vérifier (`eddsa-rdfc-2022`…), un document qu’il n’a pas pu chercher sous sa politique, ou un destinataire qui n’est pas un e-mail haché | Demander à l’émetteur un format pris en charge ou un destinataire haché ; vérifier `hosts` |
-| 409 `{"status":"valid","signal":"claimed"}` | Un autre joueur a déjà utilisé ce badge (next) | — |
+| 409 `{"status":"valid","signal":"claimed"}` | Un autre joueur a déjà utilisé ce badge (4.7.2) | — |
 | 202 avec `"status":"invalid"` | Un autre émetteur que ceux du jeu, un destinataire qui ne correspond pas, une signature mauvaise ou faible | — |
 | 413, ou 429 `{"error":"rate"}` | Un corps de plus de 64 Ko ; plus de 30 envois par minute depuis une adresse | — |
 
@@ -144,7 +144,7 @@ Arrêtez le processus (SIGTERM). Révoquez son jeton sur le Bridge s’il a fuit
   une autre courbe que P-256 pour ES256, autre chose qu’Ed25519 pour `eddsa-jcs-2022`).
 - La clé est `sha256('open-badge:' + id du badge + ':' + verdict)` : le même badge avec le même verdict pour le même
   joueur fait un seul signal. Un badge valide compte pour un seul joueur : le premier qui l’utilise le garde, un autre
-  reçoit 409 `claimed` (next). Le connecteur le retient en mémoire : un redémarrage l’oublie.
+  reçoit 409 `claimed` (4.7.2). Le connecteur le retient en mémoire : un redémarrage l’oublie.
 
 <a name="network-policy"></a>
 

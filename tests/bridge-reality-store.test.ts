@@ -290,7 +290,7 @@ describe.each(KINDS)('RealityStore: $name', (kind) => {
               hashes.push(pl.capabilityHash);
               await a.putPlayer(A, pl);
             } else if (o.t === 'signal') {
-              // A signal is for a player the store holds (next).
+              // A signal is for a player the store holds (4.7.2).
               if (await a.player(A, p)) await a.appendSignal(proposal(A, p, `k${o.k}`));
             } else if (o.t === 'ack') await a.acknowledge({ tenantId: A, playerId: p, sequence: 1 });
             else if (o.t === 'revoke') await a.revokeToken(A, `tok${o.k}`);

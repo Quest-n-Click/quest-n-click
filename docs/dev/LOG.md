@@ -9694,3 +9694,29 @@ whether the order and the cache hold.
 → next: this candidate's durations against #451's model (a cold mutation in about 81 min instead of 114), then the
 first release with a warm cache; #406's quarantine lifted once `studio-hosted (firefox)`'s warnings stay silent; the
 22 field passes, still open.
+
+## #383 · 2026-11-08 · Claude · release · 4.7.2 "Audit fixes": TODO(release)
+
+- **The request**: TODO(release)
+- **What ships**: the pull requests merged since v4.7.1, oldest first: #455 (The Studio starts from the installed
+  engine: AGENTS.md shipped, every shipped import checked (#454)), #456 (The local Studio's guard covers every letter
+  case, and serves this machine only outside LAN mode), #458 (Studio Server hardening: logout body limit, agent writes
+  with a base, one refresh per session, gc race, parallel git reads), #459 (Connectors: IMAP retention only deletes its
+  own messages; Open Badges need a hashed recipient, one player per badge), #460 (Bridge: tenancy and concurrency fixes
+  (run purge, ack/revoke, signals, SSE, pairing limit, Mystery quota)).
+- **Fragments**: 5 assembled by `npm run release -- prepare 4.7.2`, on main at `de0cd685`: `454-pack-agents`,
+  `studio-local-guard`, `connectors-email-badges`, `studio-server-hardening`, `bridge-tenancy-races`; the intro and the
+  README line from the `### Release` lines of `454-pack-agents`.
+- **Upgrade notes**: "From 4.7.1 to 4.7.2" in `install.upgrade-notes-4-7`, both languages, appended by `prepare` from
+  the release's CHANGELOG bullets, to rewrite for a reader upgrading.
+- **Reviews**: folded by `prepare` from `changes/bridge-tenancy-races.acks.json`,
+  `changes/connectors-email-badges.acks.json`, `changes/studio-local-guard.acks.json`,
+  `changes/studio-server-hardening.acks.json`: 12 translation pairs (12 with an AI's record only, D56); 12 pending acks
+  not kept, their text changed since they were read (listed by `prepare`).
+- **Fixtures**: golden save demo-4.7.2, reference run, quality baseline, written by `prepare` (the release's own write,
+  `quality:baseline -- --release --dist`).
+- **Passes**: sheet 4.7.2, the 22 of 4.7.1, none new.
+- **Signature**: the tag is signed with an SSH key `.github/allowed_signers` names (`npm run release -- 4.7.2` refuses
+  any other).
+
+→ next: TODO(release)

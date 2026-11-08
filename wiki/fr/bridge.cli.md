@@ -506,7 +506,7 @@ garde sa valeur par défaut.
 | `streamsPerInstance` : flux d’événements ouverts sur une instance | 10 000 | 0 |
 | `streamBufferBytes` : octets qu’un flux peut garder non envoyés | 65 536 | 1 |
 | `pendingPairings` : codes en attente de confirmation, tous joueurs confondus | 1 000 | 0 |
-| `pairingsPerAddress` : codes d’appairage qu’une adresse peut demander par 10 minutes (next) | 5 | 0 |
+| `pairingsPerAddress` : codes d’appairage qu’une adresse peut demander par 10 minutes (4.7.2) | 5 | 0 |
 | `resignedCache` : signaux re-signés après une rotation, gardés en mémoire | 10 000 | 0 |
 | `streamPage` : signaux qu’un flux lit d’un coup dans le stockage | 100 | 1 |
 

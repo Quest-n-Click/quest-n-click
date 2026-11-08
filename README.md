@@ -30,7 +30,7 @@ Linux. The engine installs from a release's archive, or from npm since 4.5.2 (ea
 approves it):
 
 ```bash
-T=https://github.com/Quest-n-Click/quest-n-click/releases/download/v4.7.1/quest-n-click-4.7.1.tgz
+T=https://github.com/Quest-n-Click/quest-n-click/releases/download/v4.7.2/quest-n-click-4.7.2.tgz
 npx --package=$T quest-n-click create my-game "My Game" --engine=$T
 cd my-game && npm install
 npm run assets && npm run dev        # play it; then npm run verify, npm run build
@@ -88,7 +88,7 @@ Each part is promised only as far as it is tested ([Stability and support](https
 
 "Limited" means machines test it but no person has confirmed it on real devices yet
 ([Field passes](https://github.com/Quest-n-Click/quest-n-click/wiki/EN-Contribute-Field-Passes)). Only the latest minor version gets fixes. Today:
-<!-- metric:tests -->3920<!-- /metric --> unit test declarations, the reference game proved in
+<!-- metric:tests -->3936<!-- /metric --> unit test declarations, the reference game proved in
 <!-- metric:referenceStates -->288<!-- /metric --> states, a first visit of
 <!-- metric:initialJsKB -->140<!-- /metric --> KB of JavaScript, gzipped.
 
@@ -109,7 +109,7 @@ The whole documentation is [the wiki](https://github.com/Quest-n-Click/quest-n-c
 
 ## Releases
 
-Current release: [v4.7.1 (Shorter Road)](https://github.com/Quest-n-Click/quest-n-click/releases/tag/v4.7.1): A release's prose is mostly written by `npm run release -- prepare`: the LOG entry's facts, the passes sheet, and the CHANGELOG's intro and README line from the `### Release` lines a pull request leaves in its fragment, for maintainers. A branch names the release it lands in `next` and the release writes the number, and `release -- check` runs the tests the version moves before the release pull request does, for maintainers and contributors.
+Current release: [v4.7.2 (Audit fixes)](https://github.com/Quest-n-Click/quest-n-click/releases/tag/v4.7.2): A patch for game authors: the Studio starts again from the installed engine, and the engine's package carries only files that can run in a game project.
 Every earlier release is in the [CHANGELOG](CHANGELOG.md).
 
 ## Licences

@@ -27,7 +27,7 @@ import {
   lockProblems,
   studioServerManifest,
 } from './pack-manifests.mjs';
-import { archiveEntries, shrinkwrapProblem } from '../tools/release/locked.mjs';
+import { archiveEntries, shrinkwrapProblem } from './locked.mjs';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const out = resolve(ROOT, process.argv.find((a) => a.startsWith('--out='))?.slice(6) ?? '.cache/pack');

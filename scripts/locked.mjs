@@ -1,13 +1,20 @@
-// The archives that carry their own lock (next, #546): the Bridge, the connectors and the Studio Server ship their
+// The archives that carry their own lock (#546): the Bridge, the connectors and the Studio Server ship their
 // versioned lock as npm-shrinkwrap.json (scripts/pack.mjs), and their SBOMs are read from it (scripts/sbom.mjs). npm 12
 // (12.2.2) leaves npm-shrinkwrap.json out of `npm pack`; npm 10 and 11 keep it. Without these checks such an archive
-// would ship without its lock, and its SBOM would be built quietly from the root lock instead.
+// would ship without its lock, and its SBOM would be built quietly from the root lock instead. Here, not in
+// tools/release/, because it reads scripts/pack-manifests.mjs and only scripts use it: tools/ ships in the engine package,
+// scripts/ does not (next, #552).
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
+import { PACKAGES } from '../tools/release/artifacts.mjs';
+import { LOCKED as LOCKS } from './pack-manifests.mjs';
 
-/** The archives (by their file name, `<name>-<v>.tgz`) that carry their own lock. */
-export const LOCKED = ['quest-n-click-bridge', 'quest-n-click-connectors', 'quest-n-click-studio-server'];
+/**
+ * The archives (by their file name, `<name>-<v>.tgz`) that carry their own lock: the packages pack-manifests.mjs locks
+ * that the release packs (the Bridge's image is locked too, but it is no archive).
+ */
+export const LOCKED = PACKAGES.filter((p) => LOCKS.some((l) => l.name === p.npm)).map((p) => p.name);
 
 export const isLocked = (name) => LOCKED.includes(name);
 

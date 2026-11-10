@@ -5,5 +5,5 @@
   Server archives would have shipped without their locks, and `scripts/sbom.mjs` would have built their SBOMs quietly
   from the root lock. Now `scripts/pack.mjs` checks each of those archives holds its `npm-shrinkwrap.json` and stops,
   naming the archive and the npm that packed it; `sbom.mjs` reads the root lock for the engine only and refuses a locked
-  archive without its own. One module, `tools/release/locked.mjs`, holds both checks. What is published is unchanged:
+  archive without its own. One module, `scripts/locked.mjs`, holds both checks. What is published is unchanged:
   the candidate packs with npm 10.

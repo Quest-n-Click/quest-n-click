@@ -5,7 +5,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { archiveEntries, isLocked, LOCKED, sbomLock, shrinkwrapProblem } from '../tools/release/locked.mjs';
+import { archiveEntries, isLocked, LOCKED, sbomLock, shrinkwrapProblem } from '../scripts/locked.mjs';
 // @ts-expect-error: a plain .mjs module without declarations
 import { PACKAGES } from '../tools/release/artifacts.mjs';
 
@@ -32,6 +32,8 @@ describe('the locked archives', () => {
   it('are the Bridge, the connectors and the Studio Server, each a package the release packs', () => {
     const names = PACKAGES.map((p: { name: string }) => p.name);
     for (const n of LOCKED) expect(names).toContain(n);
+    // Read from pack-manifests.mjs's locks (#552): the Bridge's image is locked too, but it is no archive.
+    expect(LOCKED).toEqual(['quest-n-click-bridge', 'quest-n-click-connectors', 'quest-n-click-studio-server']);
     expect(isLocked('quest-n-click')).toBe(false);
     expect(isLocked('create-quest-n-click')).toBe(false);
   });

@@ -18,7 +18,7 @@ import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync,
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { PACKAGES } from '../tools/release/artifacts.mjs';
-import { sbomLock } from '../tools/release/locked.mjs';
+import { sbomLock } from './locked.mjs';
 import { withVendored } from '../tools/vendored.mjs';
 
 const ROOT = resolve(import.meta.dirname, '..');

@@ -3,7 +3,7 @@
 // candidate packed, made in the candidate from what the archives hold, never in the release after an install:
 //   - quest-n-click-bridge, quest-n-click-connectors and quest-n-click-studio-server (4.2.1): their own lock
 //     (npm-shrinkwrap.json, inside the archive; the Studio Server's engine, an optional peer, is the engine's own SBOM),
-//     read by `npm sbom --package-lock-only`: nothing resolved;
+//     read by `npm sbom --package-lock-only`: nothing resolved; one without it throws (#546), never the root lock;
 //   - quest-n-click (the engine): its archive carries no lock (a game resolves its own); its dependencies as the root
 //     lock resolves them, the way scripts/locks.mjs makes a lock (the root lock copied beside its manifest, `npm install
 //     --package-lock-only`, which keeps every version the root lock has), then read the same way;
@@ -18,6 +18,7 @@ import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync,
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { PACKAGES } from '../tools/release/artifacts.mjs';
+import { sbomLock } from '../tools/release/locked.mjs';
 import { withVendored } from '../tools/vendored.mjs';
 
 const ROOT = resolve(import.meta.dirname, '..');
@@ -87,7 +88,8 @@ for (const name of names) {
         ],
       };
     } else {
-      if (!existsSync(join(dir, 'npm-shrinkwrap.json'))) {
+      // A locked archive without its shrinkwrap throws (#546): the root lock would describe another tree.
+      if (sbomLock(name, dir, ENGINE) === 'root') {
         // The engine: its dependencies as the root lock resolves them.
         copyFileSync(join(ROOT, 'package-lock.json'), join(dir, 'package-lock.json'));
         npm(['install', '--package-lock-only', '--ignore-scripts', '--no-audit', '--no-fund'], dir);

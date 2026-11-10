@@ -27,6 +27,7 @@ import {
   lockProblems,
   studioServerManifest,
 } from './pack-manifests.mjs';
+import { archiveEntries, shrinkwrapProblem } from '../tools/release/locked.mjs';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const out = resolve(ROOT, process.argv.find((a) => a.startsWith('--out='))?.slice(6) ?? '.cache/pack');
@@ -128,6 +129,7 @@ writeFileSync(
 const WIN = process.platform === 'win32';
 const npm = (a, o) =>
   execFileSync(WIN ? 'npm.cmd' : 'npm', WIN ? a.map((x) => (/\s/.test(x) ? `"${x}"` : x)) : a, { ...o, shell: WIN });
+const npmVersion = () => String(npm(['--version'], { encoding: 'utf8' })).trim();
 
 // The documentation the engine carries (4.5.0, docs/dev/PLAN-4.5-WIKI.md §4.3.4): `wiki -- bundle` writes it into the
 // prepared folder, after the tracked files are copied and before `npm pack`; never through SHIP nor git, and never
@@ -340,6 +342,9 @@ for (const d of ALL) {
   const made = `${name.replace(/^@/, '').replace('/', '-')}-${root.version}.tgz`;
   const want = `${basename(d)}-${root.version}.tgz`;
   if (made !== want) renameSync(join(out, made), join(out, want));
+  // A locked archive carries its npm-shrinkwrap.json (#546): npm 12 leaves it out of npm pack.
+  const problem = shrinkwrapProblem(basename(d), archiveEntries(join(out, want)), npmVersion());
+  if (problem) throw new Error(problem);
 }
 console.log(
   `packed into ${out}: @quest-n-click/engine ${root.version} (${files.length} files and its docs-bundle/), @quest-n-click/create, @quest-n-click/bridge (one module, its policies), @quest-n-click/connectors (one module, its MIME worker), @quest-n-click/studio-server (two commands, the Studio's page); archives under their former names`,

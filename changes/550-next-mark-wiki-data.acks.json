@@ -1,0 +1,21 @@
+{
+  "format": "quest-n-click-docs-acks",
+  "version": 1,
+  "pairs": {
+    "contribute.conventions#next-mark": {
+      "enHash": "42ffc3c1ebf945857c8f18e1f78cbcc432acc7453dfb058f6698b00d94e3de4f",
+      "frHash": "f2fc7270153e4442122cec9bca21397287dcb6498bc818d11d762fc34fe3b7c0",
+      "reviewers": [
+        { "name": "claude-opus-5-5", "kind": "ai", "relation": "author", "date": "2026-11-10" }
+      ]
+    },
+    "contribute.releasing#prepare": {
+      "enHash": "49a94667192b7e5377424b2c3b64568a1d316a59860f54ed6d3ed4fd59aa6a54",
+      "frHash": "b3b21a954571cea3dfa41df664d3df2c7f99023d50d890c1a3eb92f32c78f203",
+      "reviewers": [
+        { "name": "claude-opus-5-5", "kind": "ai", "relation": "author", "date": "2026-11-10" }
+      ]
+    }
+  },
+  "claims": {}
+}

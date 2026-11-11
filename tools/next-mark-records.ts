@@ -5,6 +5,7 @@
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { generatedPartProblems } from './wiki/check';
 import { claimsOf, claimTextHash, readReviews, writeReviews } from './wiki/claims';
 import { type Manifest, readManifest } from './wiki/manifest';
 import { parsePage } from './wiki/page';
@@ -116,4 +117,16 @@ export function rewriteWithRecords(root: string, changed: readonly { path: strin
     writePending(resolve(root, file), { ...rest, pairs: pp.records, claims: pc.records });
   }
   return moved;
+}
+
+/**
+ * The generated parts as `check` reads them, now; the function returned gives the problems that were not there then
+ * (#550). Run around the rewrite: a problem it brings is a generated page and its source out of step (a mark the
+ * rewrite wrote in one and not the other), a problem already there is not the rewrite's. `root` is the code the
+ * generators read, `wikiDir` the wiki.
+ */
+export function generatedDrift(root: string, wikiDir: string, tracked: readonly string[]): () => string[] {
+  const now = () => generatedPartProblems(root, tracked, wikiDir, manifestOf(wikiDir));
+  const before = new Set(now());
+  return () => now().filter((p) => !before.has(p));
 }

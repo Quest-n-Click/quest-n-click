@@ -7,9 +7,11 @@ import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writ
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { markKind, rewriteCode, rewriteFile, rewriteManifest, rewriteMarkdown } from '../tools/next-mark';
-import { rekey, rewriteWithRecords } from '../tools/next-mark-records';
+import { markKind, rewriteCode, rewriteData, rewriteFile, rewriteManifest, rewriteMarkdown } from '../tools/next-mark';
+import { generatedDrift, rekey, rewriteWithRecords } from '../tools/next-mark-records';
+import { trackedFiles } from '../tools/wiki/check';
 import { claimsOf, claimTextHash, readReviews, writeReviews } from '../tools/wiki/claims';
+import { generatedProblems, writeGenerated } from '../tools/wiki/generators';
 import { readManifest } from '../tools/wiki/manifest';
 import { parsePage } from '../tools/wiki/page';
 import { currentPairHashes, readTranslations, translationStates, writeTranslations } from '../tools/wiki/translations';
@@ -105,12 +107,53 @@ describe("the manifest's version fields", () => {
   });
 });
 
+describe("the wiki's data files, the generated parts' sources (#550)", () => {
+  it('writes the version in a string as the prose does, keeps the JSON valid and every other byte', () => {
+    const before = [
+      '{',
+      '  "next": "next",',
+      '  "scripts": [',
+      '    {',
+      '      "usage": "npm run x -- `(next)`",',
+      '      "description": {',
+      '        "en": "Played end to end (4.1.19); a step of the job (next, #550). A \\"quote\\" (next).",',
+      '        "fr": "Joué de bout en bout ; une étape du job (next, #550), f(next) et (nextish)."',
+      '      }',
+      '    }',
+      '  ]',
+      '}',
+      '',
+    ].join('\n');
+    const after = rewriteData(before, '4.7.9');
+    expect(after).toBe(
+      before
+        .replace('job (next, #550). A \\"quote\\" (next).', 'job (4.7.9, #550). A \\"quote\\" (4.7.9).')
+        .replace('job (next, #550), f(next)', 'job (4.7.9, #550), f(next)'),
+    );
+    expect(JSON.parse(after).scripts[0].description.fr).toBe(
+      'Joué de bout en bout ; une étape du job (4.7.9, #550), f(next) et (nextish).',
+    );
+  });
+  it('reads a string as its text: a mark after an escaped line break is a mark, the JSON still valid', () => {
+    const after = rewriteData('{ "a": "Line one.\\n(next, #550) line two." }\n', '4.7.9');
+    expect(JSON.parse(after)).toEqual({ a: 'Line one.\n(4.7.9, #550) line two.' });
+  });
+  it('leaves a data file without the mark byte for byte', () => {
+    for (const f of ['npm-scripts.json', 'cli.json', 'env.json', 'errors.json', 'glossary.json']) {
+      const text = readFileSync(resolve('wiki/data', f), 'utf8').replaceAll('(next', '(4.0.0');
+      expect(rewriteData(text, '4.7.9'), f).toBe(text);
+    }
+  });
+});
+
 describe('which files the rewrite reads', () => {
   it('the wiki pages and manifest, the source and test files; never history, fixtures or generated files', () => {
     expect(markKind('wiki/en/create.rooms.md')).toBe('markdown');
     expect(markKind('wiki/fr/create.rooms.md')).toBe('markdown');
     expect(markKind('wiki/manifest.json')).toBe('manifest');
     expect(markKind('changes/README.md')).toBe('markdown');
+    expect(markKind('wiki/data/npm-scripts.json')).toBe('data');
+    expect(markKind('wiki/data/glossary.json')).toBe('data');
     expect(markKind('src/engine/dom/map-view.ts')).toBe('code');
     expect(markKind('src/engine/dom/style.css')).toBe('code');
     expect(markKind('tests/dom/map-walk.test.ts')).toBe('code');
@@ -125,6 +168,8 @@ describe('which files the rewrite reads', () => {
       'wiki/translations.json',
       'games/demo/assets.gen.json',
       'games/demo/rooms/house.ts',
+      'wiki/data/x/y.json',
+      'wiki/data/notes.md',
     ])
       expect(markKind(no), no).toBeUndefined();
   });
@@ -239,6 +284,93 @@ describe('the rewrite on a copy of the wiki: nothing left to review (#443)', () 
   }, 60_000);
 });
 
+describe('the rewrite on a copy of the wiki: a generated page and its data agree after it (#550)', () => {
+  it("writes the version in the data and in the pages it generates, the pages' pairs carried over", () => {
+    const root = mkdtempSync(join(tmpdir(), 'next-mark-data-'));
+    try {
+      const wiki = join(root, 'wiki');
+      cpSync(resolve('wiki'), wiki, { recursive: true });
+      // The mark in a script's description, both languages, and the pages generated from it.
+      const dataFile = join(wiki, 'data/npm-scripts.json');
+      const data = JSON.parse(readFileSync(dataFile, 'utf8'));
+      const script = data.repository[0];
+      for (const l of ['en', 'fr'] as const) script.description[l] = `${script.description[l]} (next, #550)`;
+      writeFileSync(dataFile, `${JSON.stringify(data, null, 2)}\n`);
+      const ctx = { root: resolve('.'), wikiDir: wiki, tracked: trackedFiles() };
+      expect(writeGenerated(ctx, ['reference.npm-scripts']).problems).toEqual([]);
+      const manifest = readManifest(wiki).manifest!;
+      const pageOf = (l: string) => readFileSync(join(wiki, l, 'reference.npm-scripts.md'), 'utf8');
+      expect(pageOf('en')).toContain('(next, #550)');
+      const ai = { name: 'claude-opus-5-5', kind: 'ai', relation: 'author', date: '2026-11-10' } as const;
+      writeTranslations(
+        wiki,
+        Object.fromEntries(
+          [...currentPairHashes(wiki, manifest)].map(([k, h]) => [
+            k,
+            { enHash: h.enHash, frHash: h.frHash, reviewers: [ai] },
+          ]),
+        ),
+      );
+      const toReview = () =>
+        translationStates(wiki, readManifest(wiki).manifest!, readTranslations(wiki).translations).pairs.filter(
+          (p) => p.state === 'to review',
+        );
+      const reviewBefore = toReview().map((p) => p.key);
+      const drift = generatedDrift(ctx.root, wiki, ctx.tracked);
+
+      const changed = [
+        'wiki/data/npm-scripts.json',
+        'wiki/en/reference.npm-scripts.md',
+        'wiki/fr/reference.npm-scripts.md',
+      ]
+        .map((path) => {
+          const before = readFileSync(join(root, path), 'utf8');
+          return { path, before, after: rewriteFile(markKind(path)!, before, '4.7.9') };
+        })
+        .filter((c) => c.after !== c.before);
+      expect(changed.map((c) => c.path)).toHaveLength(3);
+      rewriteWithRecords(root, changed);
+      expect(readFileSync(dataFile, 'utf8')).toContain('(4.7.9, #550)');
+      expect(readFileSync(dataFile, 'utf8')).not.toContain('(next, #550)');
+      expect(pageOf('fr')).toContain('(4.7.9, #550)');
+      // The pages are what their data generates, and no pair waits for a review because of the rewrite.
+      expect(
+        generatedProblems(ctx, readManifest(wiki).manifest!).filter((p) => p.includes('reference.npm-scripts')),
+      ).toEqual([]);
+      expect(toReview().map((p) => p.key)).toEqual(reviewBefore);
+      expect(drift()).toEqual([]);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  }, 60_000);
+  it('tells a generated page the rewrite put out of step with its data: a mark the page shows as code', () => {
+    const root = mkdtempSync(join(tmpdir(), 'next-mark-drift-'));
+    try {
+      const wiki = join(root, 'wiki');
+      cpSync(resolve('wiki'), wiki, { recursive: true });
+      // A usage is shown in a code span: the page keeps the word, the data, read as prose, does not.
+      const dataFile = join(wiki, 'data/npm-scripts.json');
+      const data = JSON.parse(readFileSync(dataFile, 'utf8'));
+      const script = data.repository.find((s: { usage?: string }) => s.usage);
+      script.usage = `${script.usage} (next)`;
+      writeFileSync(dataFile, `${JSON.stringify(data, null, 2)}\n`);
+      const ctx = { root: resolve('.'), wikiDir: wiki, tracked: trackedFiles() };
+      expect(writeGenerated(ctx, ['reference.npm-scripts']).problems).toEqual([]);
+      const drift = generatedDrift(ctx.root, wiki, ctx.tracked);
+      for (const path of ['wiki/data/npm-scripts.json', 'wiki/en/reference.npm-scripts.md']) {
+        const file = join(root, path);
+        writeFileSync(file, rewriteFile(markKind(path)!, readFileSync(file, 'utf8'), '4.7.9'));
+      }
+      expect(drift()).toEqual([
+        "en/reference.npm-scripts.md: its generated part is not the code's: run `npm run wiki -- generate reference.npm-scripts`",
+        "fr/reference.npm-scripts.md: its generated part is not the code's: run `npm run wiki -- generate reference.npm-scripts`",
+      ]);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  }, 60_000);
+});
+
 describe('the wiki reads the mark before the release writes it (#443)', () => {
   it('an applies marker may say next, for its range and its since', async () => {
     const { appliesMarker } = await import('../tools/wiki/page');
@@ -277,9 +409,10 @@ describe('the command prepare runs: --write on a copy of the repository', () => 
   it('writes the version where the mark was and exits 0', () => {
     const root = mkdtempSync(join(tmpdir(), 'next-mark-cli-'));
     try {
-      for (const d of ['tools', 'wiki', 'package.json']) cpSync(resolve(d), join(root, d), { recursive: true });
-      symlinkSync(resolve('node_modules'), join(root, 'node_modules'), 'junction'); // a junction: no admin on Windows
-      mkdirSync(join(root, 'src'));
+      // src and studio-server too: the check of the generated parts after the rewrite (#550) runs the generators,
+      // which import them.
+      for (const d of ['tools', 'wiki', 'src', 'package.json']) cpSync(resolve(d), join(root, d), { recursive: true });
+      for (const d of ['node_modules', 'studio-server']) symlinkSync(resolve(d), join(root, d), 'junction'); // a junction: no admin on Windows
       writeFileSync(join(root, 'src/x.ts'), '// fixed (next, #1)\nexport {};\n');
       execFileSync('git', ['init', '-q'], { cwd: root });
       execFileSync('git', ['add', 'src', 'package.json'], { cwd: root });

@@ -503,10 +503,26 @@ function checkBlocks(manifest: Manifest, parsed: ReadonlyMap<string, ParsedPage>
 // ------------------------------------------------------------------------------------------------- A7: variables
 
 /**
+ * What `check` says of the generated parts alone: the environment register's and every generator's (tools/wiki/
+ * generators.ts), each against its source. `next mark` runs it before and after its rewrite (#550).
+ */
+export function generatedPartProblems(root: string, tracked: readonly string[], wikiDir: string, manifest: Manifest) {
+  const report = { errors: [] as string[] };
+  checkEnv(root, tracked, wikiDir, manifest, report);
+  return [...report.errors, ...generatedProblems({ root, wikiDir, tracked }, manifest)];
+}
+
+/**
  * The environment variable register (§4.7.4), when the wiki has one: every variable the code reads is described, every
  * described `code` one is still read, and the reference page's generated part and identifiers are the register's.
  */
-function checkEnv(root: string, tracked: readonly string[], wikiDir: string, manifest: Manifest, report: CheckReport) {
+function checkEnv(
+  root: string,
+  tracked: readonly string[],
+  wikiDir: string,
+  manifest: Manifest,
+  report: Pick<CheckReport, 'errors'>,
+) {
   const { register, errors } = readEnvRegister(wikiDir);
   report.errors.push(...errors);
   if (!register) return;

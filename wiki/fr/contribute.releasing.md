@@ -75,7 +75,8 @@ CHANGELOG et les entrées du LOG depuis les fragments (`npm run changes -- --ass
 `## Unreleased`, replie un `.log.md` seul et écrit la version à la place de la marque `next` de chaque fragment),
 l'entrée de release du LOG, les consignations en attente des branches versées dans `wiki/translations.json` et
 `wiki/reviews.json` (`npm run wiki -- acks --fold` ; ce qui ne tient plus à son texte est affiché, et repris dans
-l'arrêt), la marque `next` écrite comme la version dans le wiki et les commentaires du code (4.7.1, #443), les
+l'arrêt), la marque `next` écrite comme la version dans le wiki et les commentaires du code (4.7.1, #443) et dans `wiki/data/`,
+les sources des parties générées du wiki, qui sont ensuite vérifiées contre elles (next, #550), les
 enregistrements des paires et des garanties touchées reportés pour que rien ne reste à relire (étape `next mark`,
 `tools/next-mark.ts` ; [Conventions](contribute.conventions.md#next-mark)), la section des notes de mise à jour (en et fr ; une section déjà écrite à l'avance
 sous son ancre est gardée, jamais doublée, et les puces du CHANGELOG de la release vont dans un commentaire à sa fin

@@ -171,15 +171,19 @@ place de la version ; la release écrit la version.
 | La prose d'une page du wiki | `(next, #443)`, `(next)` | `npm run release -- prepare` (étape `next mark`) |
 | Le marqueur applies d'une section | `<!-- applies: next.. since next -->` | la même étape |
 | `wiki/manifest.json` | `"appliesFrom": "next"` (et `appliesUntil`, `featureSince`) | la même étape |
+| Une chaîne de `wiki/data/*.json`, la source d'une partie générée | `"… (next, #550)"` | la même étape |
 | Un commentaire dans `src/`, `tools/`, `scripts/`, `bridge/`, `cli/`, `connectors/`, `studio-server/`, `tests/` | `// … (next, #443)`, `/* … (next) */` | la même étape |
 
 La marque est le mot dans une parenthèse qui s'ouvre sur lui, après une espace ou en début de ligne : `(next)` ou
 `(next, …)`. Ne sont jamais une marque, donc jamais réécrits : le mot dans un bloc de code en ligne ou un bloc délimité
-(c'est ainsi que cette page le cite), dans du code hors d'un commentaire (`if (next) {`), dans une chaîne (le nom d'un
+(c'est ainsi que cette page le cite), dans du code hors d'un commentaire (`if (next) {`), dans une chaîne du code (le nom d'un
 test est ce que nomme une garantie : n'y écrivez pas de version), un appel nommé dans un commentaire (`swap(next)`), un
 dossier de jeu (écrit par le journal du Studio ; à renommer à la main), et tout fichier historique (le LOG, les
-sections publiées du CHANGELOG, `docs/`, `tests/fixtures/`). Une version déjà écrite n'est jamais touchée.
-`npx tsx tools/next-mark.ts --version=<v>` liste ce que l'étape réécrirait.
+sections publiées du CHANGELOG, `docs/`, `tests/fixtures/`). Une version déjà écrite n'est jamais touchée. Une chaîne
+de `wiki/data/` est lue comme de la prose, comme la lit la page générée à partir d'elle (next, #550) ; après la
+réécriture, l'étape vérifie chaque partie générée contre sa source et s'arrête quand l'une ne correspond plus (une
+marque que la page montre dans un bloc de code en ligne, par exemple), au lieu de laisser ce refus à la vérification de
+publication. `npx tsx tools/next-mark.ts --version=<v>` liste ce que l'étape réécrirait.
 
 Une paire de traduction est hachée sur son texte : la réécriture des deux côtés la laisserait à relire ; la relecture
 d'une garantie retient de même le texte de son bloc et le hachage de son fichier de test. L'étape reporte donc chaque

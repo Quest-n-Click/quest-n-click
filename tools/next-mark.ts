@@ -6,14 +6,18 @@
 //   `(next, #417)`, `(next, i18n.images)`; the parenthesis follows a space, a line start or punctuation, never a word
 //   (a call such as `swap(next)` in a comment is code, not a mark);
 // - in a wiki section's `applies` marker: `<!-- applies: next.. since next -->`;
-// - in wiki/manifest.json: `"appliesFrom": "next"` (and `appliesUntil`, `featureSince`).
+// - in wiki/manifest.json: `"appliesFrom": "next"` (and `appliesUntil`, `featureSince`);
+// - in a data file of wiki/data/, the source of a page's generated part (#550): in each string, read as prose, so the
+//   page `npm run wiki -- generate` writes from it says what the rewritten page says.
 //
 // What is never a mark: the word in a code span or a fenced block (that is how the docs quote the mark itself), in code
 // outside a comment (`if (next) {`), in a string (a test's name is what a claim names), in a historical file (the LOG,
 // the CHANGELOG's released sections, docs/, tests/fixtures/). `npm run changes -- --assemble --version=<v>` rewrites
 // the fragments; `prepare` runs this tool with `--write` for the rest, then carries the translation pairs and claim
 // reviews recorded before the rewrite over to the rewritten text (`rekey`), so a mechanical rewrite leaves nothing to
-// review. Without `--write` it lists what it would rewrite.
+// review. After the rewrite it checks that every generated part is still what its source gives: one the rewrite put out
+// of step fails the step, and `prepare` stops there instead of at the publication check. Without `--write` it lists
+// what it would rewrite.
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -120,6 +124,26 @@ export function rewriteCode(text: string, version: string) {
 export const rewriteManifest = (text: string, version: string) =>
   text.replace(/("(?:appliesFrom|appliesUntil|featureSince)":\s*)"next"/g, `$1"${version}"`);
 
+/** A JSON string literal: outside one, JSON holds no quote. */
+const JSON_STRING = /"(?:[^"\\]|\\.)*"/g;
+
+/**
+ * A data file of wiki/data/ (#550) with the marks of its strings given `version`, each string read as prose (its code
+ * spans left alone), as the page generated from it is. Every other byte is kept, so the file stays valid JSON and keeps
+ * its layout: a string is rewritten in place when that reads back as the rewritten text (the mark holds no escape), and
+ * written again by JSON.stringify when an escape sits next to the mark (`\n(next)`).
+ */
+export function rewriteData(text: string, version: string) {
+  return text.replace(JSON_STRING, (literal) => {
+    if (!literal.includes(NEXT)) return literal;
+    const value = JSON.parse(literal) as string;
+    const rewritten = proseRewrite(value, version);
+    if (rewritten === value) return literal;
+    const inPlace = `"${proseRewrite(literal.slice(1, -1), version)}"`;
+    return JSON.parse(inPlace) === rewritten ? inPlace : JSON.stringify(rewritten);
+  });
+}
+
 const CODE_EXT = /\.(?:ts|tsx|mts|cts|js|mjs|cjs|css)$/;
 /**
  * The folders whose source files the rewrite reads: the code roots of a fragment, the Studio Server and the tests. Not
@@ -128,9 +152,12 @@ const CODE_EXT = /\.(?:ts|tsx|mts|cts|js|mjs|cjs|css)$/;
  */
 const CODE_DIRS = ['src/', 'bridge/', 'tools/', 'scripts/', 'cli/', 'connectors/', 'studio-server/', 'tests/'];
 
+export type MarkKind = 'markdown' | 'code' | 'manifest' | 'data';
+
 /** How a tracked file is rewritten, or undefined when it is not: history, fixtures, generated or vendored files. */
-export function markKind(path: string): 'markdown' | 'code' | 'manifest' | undefined {
+export function markKind(path: string): MarkKind | undefined {
   if (path === 'wiki/manifest.json') return 'manifest';
+  if (/^wiki\/data\/[^/]+\.json$/.test(path)) return 'data';
   if (path === 'changes/README.md') return 'markdown';
   if (/^wiki\/(en|fr)\/[^/]+\.md$/.test(path)) return 'markdown';
   if (path.startsWith('tests/fixtures/') || path.includes('/node_modules/') || path.includes('.gen.')) return undefined;
@@ -139,9 +166,10 @@ export function markKind(path: string): 'markdown' | 'code' | 'manifest' | undef
 }
 
 /** A file's text with its marks given `version`, as its kind reads them. */
-export function rewriteFile(kind: 'markdown' | 'code' | 'manifest', text: string, version: string) {
+export function rewriteFile(kind: MarkKind, text: string, version: string) {
   if (kind === 'markdown') return rewriteMarkdown(text, version);
   if (kind === 'code') return rewriteCode(text, version);
+  if (kind === 'data') return rewriteData(text, version);
   return rewriteManifest(text, version);
 }
 
@@ -169,9 +197,18 @@ if (process.argv[1]?.endsWith('next-mark.ts')) {
     console.log(`${changed.length} file(s) to rewrite, the mark ${NEXT} made ${version}`);
     process.exit(0);
   }
-  const { rewriteWithRecords } = await import('./next-mark-records');
+  const { generatedDrift, rewriteWithRecords } = await import('./next-mark-records');
+  const drift = generatedDrift(root, resolve(root, 'wiki'), tracked);
   const moved = rewriteWithRecords(root, changed);
+  const brought = drift();
   console.log(
     `✔  ${changed.length} file(s): the mark ${NEXT} written ${version}${changed.length ? ` (${changed.map((c) => c.path).join(', ')})` : ''}; ${moved.pairs} pair hash(es) and ${moved.claims} claim hash(es) carried over`,
   );
+  if (brought.length) {
+    for (const p of brought) console.error(`✖  ${p}`);
+    console.error(
+      `✖  the rewrite put ${brought.length} generated part(s) out of step with their source: write the version where the page and its source differ, then \`npm run wiki -- check\``,
+    );
+    process.exit(1);
+  }
 }

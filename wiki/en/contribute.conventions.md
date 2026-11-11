@@ -167,14 +167,18 @@ the version.
 | A wiki page's prose | `(next, #443)`, `(next)` | `npm run release -- prepare` (step `next mark`) |
 | A section's applies marker | `<!-- applies: next.. since next -->` | the same step |
 | `wiki/manifest.json` | `"appliesFrom": "next"` (and `appliesUntil`, `featureSince`) | the same step |
+| A string of `wiki/data/*.json`, the source of a generated part | `"… (next, #550)"` | the same step |
 | A comment in `src/`, `tools/`, `scripts/`, `bridge/`, `cli/`, `connectors/`, `studio-server/`, `tests/` | `// … (next, #443)`, `/* … (next) */` | the same step |
 
 The mark is the word in a parenthesis that opens on it, after a space or a line start: `(next)` or `(next, …)`. Never
 a mark, so never rewritten: the word in a code span or a fenced block (this page quotes it so), in code outside a
-comment (`if (next) {`), in a string (a test's name is what a claim names: write no version in it), a call named in a
+comment (`if (next) {`), in a string of the code (a test's name is what a claim names: write no version in it), a call named in a
 comment (`swap(next)`), a game folder (written through the Studio's journal; rename by hand), and every historical
 file (the LOG, the CHANGELOG's released sections, `docs/`, `tests/fixtures/`). A version already written is never
-touched. `npx tsx tools/next-mark.ts --version=<v>` lists what the step would rewrite.
+touched. A string of `wiki/data/` is read as prose, the way the page generated from it reads it (next, #550); after
+the rewrite the step checks every generated part against its source and stops when one no longer matches (a mark the
+page shows in a code span, say), rather than leave it to the publication check. `npx tsx tools/next-mark.ts
+--version=<v>` lists what the step would rewrite.
 
 A translation pair is hashed on its text, so the rewrite of both sides would leave it to review; a claim's review
 holds its block's text and its test file's hash the same way. The step therefore carries every record that held the

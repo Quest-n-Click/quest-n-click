@@ -24,7 +24,7 @@ stops the pack ("git add or commit them, or add them to .gitignore") rather than
 the connectors and the Studio Server carry their versioned lock as `npm-shrinkwrap.json`; a lock that no longer fits
 its manifest stops the pack: `npm run locks` makes it again (review the diff, commit it), and `npm run locks -- --check`
 says whether each lock still fits without the network. An archive of theirs packed without its `npm-shrinkwrap.json`
-stops the pack too, and its SBOM is refused rather than read from the root lock (next, #546): npm 12 leaves the file out
+stops the pack too, and its SBOM is refused rather than read from the root lock (4.7.4, #546): npm 12 leaves the file out
 of `npm pack`, npm 10 and 11 keep it.
 
 From 4.2.5 to 4.2.x each package was also packed under its former web-scumm name, an alias with the same files and

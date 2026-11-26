@@ -25,7 +25,7 @@ Le Bridge, les connecteurs et le Studio Server portent leur verrou versionné en
 correspond plus à son manifeste arrête l'empaquetage : `npm run locks` le refait (relire le diff, le commiter), et
 `npm run locks -- --check` dit, sans réseau, si chaque verrou correspond encore. Une de leurs archives empaquetée sans
 son `npm-shrinkwrap.json` arrête aussi l'empaquetage, et son SBOM est refusé plutôt que lu dans le verrou racine
-(next, #546) : npm 12 laisse ce fichier hors de `npm pack`, npm 10 et 11 le gardent.
+(4.7.4, #546) : npm 12 laisse ce fichier hors de `npm pack`, npm 10 et 11 le gardent.
 
 De la 4.2.5 à la 4.2.x, chaque paquet était aussi empaqueté sous son ancien nom web-scumm, un alias aux mêmes fichiers
 et à la même version (D47). La 4.3.0 n'empaquette plus que les nouveaux noms ; `npx quest-n-click migrate` fait quitter

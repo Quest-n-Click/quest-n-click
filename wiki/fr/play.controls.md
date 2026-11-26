@@ -21,7 +21,7 @@ autrement ses verbes et ses boutons, et en avoir plus ou moins.
 - **Sur un ordinateur**, avec une souris et une fenêtre d’au moins 720 × 450 pixels, la mise en page classique : la
   scène en haut, la ligne de phrase, puis les verbes, le sac et les outils sur une rangée en dessous. Survoler une
   chose la nomme dans la ligne de phrase et change le pointeur en main. Survoler un outil (la carte, la pause, la
-  musique, un personnage à incarner) y écrit son nom à la place de « Aller vers » (next).
+  musique, un personnage à incarner) y écrit son nom à la place de « Aller vers » (4.7.4).
 
 <a name="tap-and-verbs"></a>
 

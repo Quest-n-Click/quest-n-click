@@ -1,6 +1,6 @@
 # Notes de mise à jour : 4.7
 
-Ce que la 4.7.0, puis la 4.7.1, la 4.7.2 et la 4.7.3, ont changé. Rien à modifier dans un jeu : il se construit, se joue et se sauvegarde comme en 4.6.0.
+Ce que la 4.7.0, puis la 4.7.1, la 4.7.2, la 4.7.3 et la 4.7.4, ont changé. Rien à modifier dans un jeu : il se construit, se joue et se sauvegarde comme en 4.6.0.
 Chaque ajout est facultatif ; tous sauf `keepPlaying` de la fin sont visuels, invisibles aux règles, sauvegardes et
 solveur.
 
@@ -172,3 +172,30 @@ seule action de mise en place dont le `npm ci` attend la fin d'un hoquet du regi
 `e2e:portrait`, le contrôle des spoilers de la démo du site et, quand un connecteur ou le Bridge change, les connecteurs
 depuis leur archive. La nightly saute un commit déjà testé et dit comment la relancer à la main ; le workflow
 hebdomadaire `prove` a disparu. [`CHANGELOG.md`](../../CHANGELOG.md) détaille chaque changement.
+
+<a name="from-4-7-3-to-4-7-4"></a>
+<!-- applies: 4.7.4.. -->
+
+## De la 4.7.3 à la 4.7.4 « Signposts »
+
+Rien à changer dans un jeu : il se construit, se joue et se sauvegarde comme en 4.7.3. La 4.7.4 rend les boutons
+d'outils plus lisibles sur ordinateur, fait passer le Studio Server à des versions plus récentes de ses bibliothèques de
+connexion et corrige deux étapes des outils de release.
+
+**Dans un jeu**, sur ordinateur : survoler un outil (la carte, la pause, la musique, un personnage à incarner) écrit son
+nom dans la ligne de phrase à la place de « Aller vers », le même texte que son infobulle. Dans un jeu à plusieurs
+personnages jouables, plus de trois outils visibles se rangent désormais sur deux colonnes à côté du sac au lieu d'une,
+et les boutons gardent leur taille (les icônes de la démo faisaient 11 px de haut en 1024 × 640, 30 maintenant) ; le
+sac cède la largeur d'un bouton. Un jeu qui n'a que les boutons carte, pause et musique reste tel quel, et rien ne
+change sur un téléphone.
+
+**Pour un Studio Server**, rien à configurer : les bibliothèques de connexion passent à `jose@6.2.18` et
+`openid-client@6.9.0`, dans son verrou versionné.
+
+**Pour un mainteneur**, empaqueter avec npm 12 s'arrête quand une archive du Bridge, des connecteurs ou du Studio Server
+a perdu son `npm-shrinkwrap.json`, et `scripts/sbom.mjs` refuse une telle archive au lieu de construire son SBOM depuis
+le verrou racine ; le candidat empaquette toujours avec npm 10, donc ce qui est publié ne change pas. Le marquage `next`
+de `prepare` écrit maintenant la version dans `wiki/data/*.json` aussi, puis vérifie chaque page générée contre sa
+source. Les contributeurs passent à Playwright 1.65.1 (l'image Linux des navigateurs de la CI avec lui), Vite 8.3.8,
+Vitest 5.1.1, Biome 2.6.8 et knip 6.46.1 : lancez `npm ci`. [`CHANGELOG.md`](../../CHANGELOG.md) détaille chaque
+changement.

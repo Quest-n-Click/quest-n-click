@@ -175,7 +175,7 @@ a mark, so never rewritten: the word in a code span or a fenced block (this page
 comment (`if (next) {`), in a string of the code (a test's name is what a claim names: write no version in it), a call named in a
 comment (`swap(next)`), a game folder (written through the Studio's journal; rename by hand), and every historical
 file (the LOG, the CHANGELOG's released sections, `docs/`, `tests/fixtures/`). A version already written is never
-touched. A string of `wiki/data/` is read as prose, the way the page generated from it reads it (next, #550); after
+touched. A string of `wiki/data/` is read as prose, the way the page generated from it reads it (4.7.4, #550); after
 the rewrite the step checks every generated part against its source and stops when one no longer matches (a mark the
 page shows in a code span, say), rather than leave it to the publication check. `npx tsx tools/next-mark.ts
 --version=<v>` lists what the step would rewrite.

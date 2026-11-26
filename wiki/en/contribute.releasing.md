@@ -71,7 +71,7 @@ and writes the version in place of each fragment's `next` mark), the LOG's relea
 folded into `wiki/translations.json` and `wiki/reviews.json` (`npm run wiki -- acks --fold`; what no longer holds its
 text is printed, and repeated in the stop), the `next` mark written as the version in the wiki and the code's comments
 (4.7.1, #443) and in `wiki/data/`, the sources of the wiki's generated parts, which are then checked against them
-(next, #550), the records of the pairs and claims it touches carried over so nothing is left to review (step `next
+(4.7.4, #550), the records of the pairs and claims it touches carried over so nothing is left to review (step `next
 mark`, `tools/next-mark.ts`; [Conventions](contribute.conventions.md#next-mark)), the upgrade notes' section (en and fr;
 a section already written ahead under its anchor is kept, never doubled, the release's CHANGELOG bullets put in a
 comment at its end for its author, 4.7.0), the transition pages, the golden save (listed in

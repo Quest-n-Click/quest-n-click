@@ -30,7 +30,7 @@ Linux. The engine installs from a release's archive, or from npm since 4.5.2 (ea
 approves it):
 
 ```bash
-T=https://github.com/Quest-n-Click/quest-n-click/releases/download/v4.7.3/quest-n-click-4.7.3.tgz
+T=https://github.com/Quest-n-Click/quest-n-click/releases/download/v4.7.4/quest-n-click-4.7.4.tgz
 npx --package=$T quest-n-click create my-game "My Game" --engine=$T
 cd my-game && npm install
 npm run assets && npm run dev        # play it; then npm run verify, npm run build
@@ -88,7 +88,7 @@ Each part is promised only as far as it is tested ([Stability and support](https
 
 "Limited" means machines test it but no person has confirmed it on real devices yet
 ([Field passes](https://github.com/Quest-n-Click/quest-n-click/wiki/EN-Contribute-Field-Passes)). Only the latest minor version gets fixes. Today:
-<!-- metric:tests -->4101<!-- /metric --> unit test declarations, the reference game proved in
+<!-- metric:tests -->4115<!-- /metric --> unit test declarations, the reference game proved in
 <!-- metric:referenceStates -->288<!-- /metric --> states, a first visit of
 <!-- metric:initialJsKB -->140<!-- /metric --> KB of JavaScript, gzipped.
 
@@ -109,7 +109,7 @@ The whole documentation is [the wiki](https://github.com/Quest-n-Click/quest-n-c
 
 ## Releases
 
-Current release: [v4.7.3 (Shipshape)](https://github.com/Quest-n-Click/quest-n-click/releases/tag/v4.7.3): A patch of fixes and CI work: the engine installs with npm 12, and the engine, the Studio Server, the connectors and the Bridge get the fixes found since 4.7.2.
+Current release: [v4.7.4 (Signposts)](https://github.com/Quest-n-Click/quest-n-click/releases/tag/v4.7.4): A small patch: on a computer, the tool buttons name themselves under the mouse and keep their size with several playable characters, and the Studio Server moves to newer sign-in libraries.
 Every earlier release is in the [CHANGELOG](CHANGELOG.md).
 
 ## Licences

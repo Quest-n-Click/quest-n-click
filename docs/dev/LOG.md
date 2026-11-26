@@ -9819,3 +9819,33 @@ override breaks the PWA precache; `keyOf` in the Open Badges verifier, which rea
 
 → next: the candidate started by the release's merge, then `npm run release -- 4.7.3`; #546's shrinkwrap check in
 `scripts/pack.mjs` and `scripts/sbom.mjs`, which did not land with #547.
+
+## #385 · 2026-11-26 · Claude · release · 4.7.4 "Signposts": the tool buttons named under a mouse and kept full size on a computer, the dependencies since 4.7.3
+
+- **The request**: after 4.7.3, the maintainer asked for the map, volume and pause buttons to show their name in
+  place of the walk verb under a mouse (#559), then saw in the screenshot that the tool buttons were tiny on a computer
+  in the demo, a game with two playable characters (#561). With both merged, and the dependency group (#557) and the
+  two release-tooling fixes (#546, #550) already on main, a patch named "Signposts": the buttons now say what they are.
+- **What ships**: the pull requests merged since v4.7.3, oldest first: #549 (Pack and SBOM: a locked archive without its
+  npm-shrinkwrap.json stops them (#546)), #553 (Locked archives: their list read from pack-manifests.mjs, the helper
+  moved to scripts/ (#552)), #554 (Build(deps-dev): Bump @hono/node-server from 2.1.3 to 2.1.8), #555 (Build(deps-dev):
+  Bump hono from 4.13.12 to 4.13.18), #551 (Release: next mark rewrites the wiki's generated sources too, so the pages
+  match them (#550)), #558 (Dependencies (#557): the minor-and-patch group, with Playwright's image and the Studio
+  Server's lock), #560 (Engine (#559): the tools name themselves in the sentence line under a mouse), #562 (Engine
+  (#561): on a computer, more than three tools go into two columns).
+- **Fragments**: 5 assembled by `npm run release -- prepare 4.7.4`, on main at `d433f7dd`: `546-shrinkwrap-loud`,
+  `550-next-mark-wiki-data`, `557-minor-and-patch`, `559-tool-names-on-hover`, `561-desk-tools-two-columns`; no
+  `### Release` line.
+- **Upgrade notes**: "From 4.7.3 to 4.7.4" in `install.upgrade-notes-4-7`, both languages, appended by `prepare` from
+  the release's CHANGELOG bullets, to rewrite for a reader upgrading.
+- **Reviews**: folded by `prepare` from `changes/550-next-mark-wiki-data.acks.json`,
+  `changes/559-tool-names-on-hover.acks.json`, `changes/ccr-f06283fe-rthq9y.acks.json`: 4 translation pairs (4 with an
+  AI's record only, D56).
+- **Fixtures**: golden save demo-4.7.4, reference run, quality baseline, written by `prepare` (the release's own write,
+  `quality:baseline -- --release --dist`).
+- **Passes**: sheet 4.7.4, the 22 of 4.7.3, none new.
+- **Signature**: the tag is signed with an SSH key `.github/allowed_signers` names (`npm run release -- 4.7.4` refuses
+  any other).
+
+→ next: the candidate started by the release's merge, then `npm run release -- 4.7.4`; the two `(next)` marks in
+`docs/dev/threat-models/` (`email.md`, `open-badge.md`), in a folder `next-mark` does not read, unwritten since 4.7.3.

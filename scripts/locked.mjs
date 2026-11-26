@@ -3,7 +3,7 @@
 // (12.2.2) leaves npm-shrinkwrap.json out of `npm pack`; npm 10 and 11 keep it. Without these checks such an archive
 // would ship without its lock, and its SBOM would be built quietly from the root lock instead. Here, not in
 // tools/release/, because it reads scripts/pack-manifests.mjs and only scripts use it: tools/ ships in the engine package,
-// scripts/ does not (next, #552).
+// scripts/ does not (4.7.4, #552).
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';

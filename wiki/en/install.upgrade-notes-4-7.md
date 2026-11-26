@@ -1,6 +1,6 @@
 # Upgrade notes: 4.7
 
-What 4.7.0 changed, then 4.7.1, 4.7.2 and 4.7.3. Nothing to change in a game: it builds, plays and saves as on 4.6.0. Every addition is optional;
+What 4.7.0 changed, then 4.7.1, 4.7.2, 4.7.3 and 4.7.4. Nothing to change in a game: it builds, plays and saves as on 4.6.0. Every addition is optional;
 all but the end's `keepPlaying` are presentation only, unseen by rules, saves and the solver.
 
 The upgrade itself is [Upgrade](install.upgrade.md).
@@ -153,3 +153,27 @@ setup action whose `npm ci` waits out a registry hiccup, skips the jobs the plan
 (their checks now read `mutation / …`), and runs `e2e:portrait`, the website demo's spoiler check and, when a connector
 or the Bridge changes, the connectors from their archive. The nightly skips a commit it already tested and says how to
 re-run it by hand; the weekly `prove` workflow is gone. [`CHANGELOG.md`](../../CHANGELOG.md) has each change.
+
+<a name="from-4-7-3-to-4-7-4"></a>
+<!-- applies: 4.7.4.. -->
+
+## From 4.7.3 to 4.7.4 "Signposts"
+
+Nothing to change in a game: it builds, plays and saves as on 4.7.3. 4.7.4 makes the tool buttons easier to read on a
+computer, moves the Studio Server to newer sign-in libraries, and fixes two steps of the release tooling.
+
+**In a game**, on a computer: hovering a tool (the map, the pause, the music, a character to switch to) writes its name
+in the sentence line in place of "Walk to", the same text as its tooltip. In a game with several playable characters,
+more than three visible tools now stand in two columns beside the bag instead of one, so the buttons keep their size
+(the demo's icons were 11 px tall at 1024 × 640, now 30); the bag gives up the width of one button. A game with only
+the map, pause and music buttons looks as before, and a phone shows no change.
+
+**For a Studio Server**, nothing to configure: the sign-in libraries move to `jose@6.2.18` and `openid-client@6.9.0`,
+in its versioned lock.
+
+**For a maintainer**, packing with npm 12 stops when a Bridge, connectors or Studio Server archive has lost its
+`npm-shrinkwrap.json`, and `scripts/sbom.mjs` refuses such an archive instead of building its SBOM from the root lock;
+the candidate still packs with npm 10, so what is published is unchanged. `prepare`'s next mark now writes the version
+in `wiki/data/*.json` too, then checks every generated page against its source. Contributors move to Playwright 1.65.1
+(CI's Linux browser image with it), Vite 8.3.8, Vitest 5.1.1, Biome 2.6.8 and knip 6.46.1: run `npm ci`.
+[`CHANGELOG.md`](../../CHANGELOG.md) has each change.

@@ -180,7 +180,7 @@ La marque est le mot dans une parenthèse qui s'ouvre sur lui, après une espace
 test est ce que nomme une garantie : n'y écrivez pas de version), un appel nommé dans un commentaire (`swap(next)`), un
 dossier de jeu (écrit par le journal du Studio ; à renommer à la main), et tout fichier historique (le LOG, les
 sections publiées du CHANGELOG, `docs/`, `tests/fixtures/`). Une version déjà écrite n'est jamais touchée. Une chaîne
-de `wiki/data/` est lue comme de la prose, comme la lit la page générée à partir d'elle (next, #550) ; après la
+de `wiki/data/` est lue comme de la prose, comme la lit la page générée à partir d'elle (4.7.4, #550) ; après la
 réécriture, l'étape vérifie chaque partie générée contre sa source et s'arrête quand l'une ne correspond plus (une
 marque que la page montre dans un bloc de code en ligne, par exemple), au lieu de laisser ce refus à la vérification de
 publication. `npx tsx tools/next-mark.ts --version=<v>` liste ce que l'étape réécrirait.

@@ -4375,10 +4375,10 @@
       ]
     },
     "contribute.conventions#next-mark": {
-      "enHash": "eb06de6026aa00ce3417e44f3d63fe8771a73a820d5be9fdbd24cf0bd599c7e7",
-      "frHash": "b4cd83f5f03a837b304020cc001c9b35796fe71367acf04ed982c9dc376c70de",
+      "enHash": "e94d8943bfeae2d6575202ccaaab3db88505983fdc937ef548b11404e1ef5df2",
+      "frHash": "674ac7fb8aa4f76899455b8e154677a6e8d32a9f12d306911ac3c6fc27ceb184",
       "reviewers": [
-        { "name": "claude-opus-5-5", "kind": "ai", "relation": "author", "date": "2026-11-05" }
+        { "name": "claude-opus-5-5", "kind": "ai", "relation": "author", "date": "2026-11-10" }
       ]
     },
     "contribute.conventions#related": {
@@ -4986,10 +4986,10 @@
       ]
     },
     "contribute.npm-packages#packages": {
-      "enHash": "7fc72c311763479d86a9da860c02adda3f760f84d0097209beb5a4e16e846786",
-      "frHash": "337f06aa5501257bfdcefa1f33f26dfcb8d4cb7058084d18854e2e4a685df526",
+      "enHash": "a04d4da37cd3ac2f325a966d57dd580b58a2ff943c70808700246104bd93609b",
+      "frHash": "26a070d947a6d32a3685e648bde21deb641e0c6ed6b992f204f8c58be64b5011",
       "reviewers": [
-        { "name": "claude-285-hashed-requirements", "kind": "ai", "relation": "author", "date": "2026-10-24" }
+        { "name": "Claude", "kind": "ai", "relation": "author", "date": "2026-11-10" }
       ]
     },
     "contribute.npm-packages#publishing-steps": {
@@ -5157,8 +5157,8 @@
       ]
     },
     "contribute.releasing#prepare": {
-      "enHash": "c524b48f15620ed7a0fad5d4ecf3702dc24834c89baf96676a47554490516a65",
-      "frHash": "6c35079a4b1ee881ed0e5e95080757872a7edad0f405c621cb7dcf024994e806",
+      "enHash": "56f26935e89e4642fa1d0e61d022933138df5fddbc8032a811f33cee388620ff",
+      "frHash": "0fce87cc8d8985d3c0fc15c6abca3f1dfedf47b1bc5303b354b2341a2ef9bc31",
       "reviewers": [
         { "name": "claude-opus-5-5", "kind": "ai", "relation": "author", "date": "2026-11-10" }
       ]
@@ -12829,10 +12829,10 @@
       ]
     },
     "install.upgrade-notes-4-7#_lead": {
-      "enHash": "b044c99e826e5772dffdabf6f5e355bff52a9609e342c3d4cb131b5f4c68d9f3",
-      "frHash": "9f1b0badf26eb63a85f4363235be324a9385ecf32ecbcdeec8b19e9d0e6f4bac",
+      "enHash": "7747e52cc9cdf7cd476b81a42bfe8ba185c4e231fc60acd5974e62a12d75efbc",
+      "frHash": "135b7307676f94b88ab59d4d034f6cd6d6fa2caf544cb8a0dbe38618b46096c8",
       "reviewers": [
-        { "name": "claude-opus-5-5", "kind": "ai", "relation": "author", "date": "2026-11-10" }
+        { "name": "claude-opus-5-5", "kind": "ai", "relation": "author", "date": "2026-11-26" }
       ]
     },
     "install.upgrade-notes-4-7#from-4-6-0-to-4-7-0": {
@@ -12861,6 +12861,13 @@
       "frHash": "c0024dbb10dba7146c3f6b44ab86da868fa3eee3b40c3edb822f0155a763506b",
       "reviewers": [
         { "name": "claude-opus-5-5", "kind": "ai", "relation": "author", "date": "2026-11-10" }
+      ]
+    },
+    "install.upgrade-notes-4-7#from-4-7-3-to-4-7-4": {
+      "enHash": "347ff0afed3e202a708e82d7fed0f5d230a95cbd969fb0798503450ab9d46740",
+      "frHash": "b06bca47872eb3e9b635693494ca4443af801c62d069e09d8c42dd8b1df0c2c9",
+      "reviewers": [
+        { "name": "claude-opus-5-5", "kind": "ai", "relation": "author", "date": "2026-11-26" }
       ]
     },
     "install.upgrade-notes-v2-to-v3#_lead": {
@@ -13063,10 +13070,10 @@
       ]
     },
     "play.controls#layouts": {
-      "enHash": "ae47056c487866f507567f0f929807820578fae053322814513234340d12ac1d",
-      "frHash": "b65dce8b72f117e475875d44a347b5d0dbdd5046caadc2f48d5bf5efdc80c77b",
+      "enHash": "7437a0ceb52c4e9cec3d92fc850a6bba5a4ca9843bbb4b5f4a43700709f6c97d",
+      "frHash": "d5d50b3bfc56b8e119634c42dee67ac77ff19437a649a2722ad7ccf9cb426f3e",
       "reviewers": [
-        { "name": "claude", "kind": "ai", "relation": "author", "date": "2026-11-03" }
+        { "name": "claude-opus-5-5", "kind": "ai", "relation": "author", "date": "2026-11-25" }
       ]
     },
     "play.controls#minigames": {

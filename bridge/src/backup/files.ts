@@ -24,18 +24,20 @@ import { BackupError } from './schema';
  * byte is read, at most `max + 1` bytes read, and a file that changed size while read refused.
  */
 export function readBounded(path: string, max: number): string {
-  const l = lstatSync(path, { throwIfNoEntry: false });
+  // As bigints: a number `ino` is a 64-bit id rounded to a double, so on Windows two files can share it (#564).
+  const l = lstatSync(path, { bigint: true, throwIfNoEntry: false });
   if (!l) throw new BackupError(`${path} does not exist`);
   if (l.isSymbolicLink() || !l.isFile()) throw new BackupError(`${path} is not a regular file`);
   // No link followed where the system can refuse one (a link swapped in after the lstat), and the file opened must be
   // the one looked at.
   const fd = openSync(path, constants.O_RDONLY | (constants.O_NOFOLLOW ?? 0));
   try {
-    const st = fstatSync(fd);
+    const st = fstatSync(fd, { bigint: true });
     if (!st.isFile() || st.ino !== l.ino || st.dev !== l.dev)
       throw new BackupError(`${path} is not a regular file (or changed while it was opened)`);
-    if (st.size > max) throw new BackupError(`${path} holds ${st.size} bytes, more than ${max} (--max-bytes=)`);
-    const buf = Buffer.alloc(st.size + 1);
+    if (st.size > BigInt(max)) throw new BackupError(`${path} holds ${st.size} bytes, more than ${max} (--max-bytes=)`);
+    const size = Number(st.size);
+    const buf = Buffer.alloc(size + 1);
     let got = 0;
     for (;;) {
       const n = readSync(fd, buf, got, buf.length - got, got);
@@ -43,7 +45,7 @@ export function readBounded(path: string, max: number): string {
       got += n;
       if (got === buf.length) break;
     }
-    if (got !== st.size) throw new BackupError(`${path} changed while it was read`);
+    if (got !== size) throw new BackupError(`${path} changed while it was read`);
     return buf.subarray(0, got).toString('utf8');
   } finally {
     closeSync(fd);

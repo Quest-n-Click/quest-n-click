@@ -47,16 +47,24 @@ const hook = vi.hoisted(() => ({
   write: undefined as undefined | ((real: Fs['writeSync'], ...a: [number, Buffer, number, number]) => number),
   link: undefined as undefined | ((a: string, b: string) => void),
   pkg: undefined as undefined | string,
+  /** Every number `ino` the same, as a 64-bit file id rounded to a double can be on Windows (#564); a bigint one exact. */
+  lossyIno: false,
 }));
 vi.mock('node:fs', async (importOriginal) => {
   const fs = await importOriginal<Fs>();
   const mocked = {
     ...fs,
-    lstatSync: ((p: string, o: never) => {
-      const r = fs.lstatSync(p, o);
+    lstatSync: ((p: string, o?: { bigint?: boolean }) => {
+      const r = fs.lstatSync(p, o as never);
       hook.afterLstat?.(String(p));
+      if (r && hook.lossyIno && !o?.bigint) r.ino = 2 ** 53;
       return r;
     }) as Fs['lstatSync'],
+    fstatSync: ((fd: number, o?: { bigint?: boolean }) => {
+      const r = fs.fstatSync(fd, o as never);
+      if (hook.lossyIno && !o?.bigint) r.ino = 2 ** 53;
+      return r;
+    }) as Fs['fstatSync'],
     readSync: ((...a: [number, Buffer, number, number, number]) =>
       hook.read ? hook.read(fs.readSync, ...a) : fs.readSync(...a)) as Fs['readSync'],
     writeSync: ((...a: [number, Buffer, number, number]) =>
@@ -74,6 +82,7 @@ const temps: string[] = [];
 const opened: SqlRealityStore[] = [];
 afterEach(() => {
   hook.afterLstat = hook.read = hook.write = hook.link = hook.pkg = undefined;
+  hook.lossyIno = false;
 });
 afterAll(async () => {
   for (const s of opened) await s.close().catch(() => {});
@@ -198,6 +207,20 @@ describe('a backup file is read bounded', () => {
       if (p === f) renameSync(join(d, 'other.json'), f);
     };
     expect(() => readBounded(f, 100)).toThrow(/changed while it was opened/);
+  });
+
+  it('a swap is refused even where the number ino of two files is the same (64-bit ids rounded, Windows, #564)', () => {
+    const d = tmp();
+    const f = join(d, 'b.json');
+    writeFileSync(f, 'first');
+    writeFileSync(join(d, 'other.json'), 'other');
+    hook.lossyIno = true;
+    hook.afterLstat = (p) => {
+      hook.afterLstat = undefined;
+      if (p === f) renameSync(join(d, 'other.json'), f);
+    };
+    expect(() => readBounded(f, 100)).toThrow(/changed while it was opened/);
+    expect(readBounded(f, 100)).toBe('other');
   });
 
   it('reads through short reads, and refuses a file that grew while it was read', () => {
